@@ -1106,7 +1106,7 @@
             <h3 class="text-xl font-bold mb-6 text-nature-800 flex items-center gap-2">
               <i class="ph-fill ph-envelope-open text-nature-500"></i> 聯絡我們
             </h3>
-            <form id="contact-form" class="space-y-4" novalidate>
+            <form id="contact-form" class="space-y-4" data-api-endpoint="https://danchun-contact-api.change280.workers.dev" novalidate>
               <input
                 type="text" name="name" id="form-name" required
                 placeholder="請輸入您的姓名"
@@ -1128,8 +1128,8 @@
                 <div class="g-recaptcha" data-sitekey="6LfPLu0sAAAAAPNfQUbxWBxNuJmbra-MqAL-oz3K"></div>
               </div>
 
-              <!-- 驗證提示 -->
-              <p id="form-error" class="hidden text-xs text-red-500">*請先完成 reCAPTCHA 驗證</p>
+              <!-- 驗證/送出提示 -->
+              <p id="form-error" class="hidden text-xs text-red-500"></p>
 
               <!-- 送出按鈕 -->
               <button
@@ -1308,28 +1308,130 @@
     document.addEventListener('DOMContentLoaded', () => {
       const toggleBtn      = document.getElementById('toggleAnnotations');
 
-      /* ── 聯絡表單 reCAPTCHA v2 驗證 ── */
+      /* ── 聯絡表單 reCAPTCHA v2 + API 正式送出 ── */
       const contactForm   = document.getElementById('contact-form');
       const formError     = document.getElementById('form-error');
       const formSuccess   = document.getElementById('form-success');
-      if (contactForm) {
-        contactForm.addEventListener('submit', (e) => {
+      const submitButton  = document.getElementById('form-submit');
+      const DEFAULT_API_ENDPOINT = '';
+      const CONTACT_API_VERSION = '2026-05-16';
+      const CONTACT_REQUEST_CONTENT_TYPE = 'application/json';
+
+      // 固定對接契約
+      // Request(JSON): {
+      //   apiVersion: string,
+      //   name: string,
+      //   email: string,
+      //   message: string,
+      //   recaptchaToken: string,
+      //   source: string,
+      //   submittedAt: string(ISO8601)
+      // }
+      // Response(JSON): {
+      //   ok: boolean,
+      //   message: string,
+      //   requestId?: string,
+      //   fieldErrors?: { name?: string, email?: string, message?: string }
+      // }
+
+      async function parseContactApiResponse(response) {
+        const contentType = response.headers.get('content-type') || '';
+        const isJson = contentType.includes('application/json');
+        const body = isJson ? await response.json() : null;
+
+        if (!response.ok) {
+          const serverMessage = body && body.message ? body.message : `送出失敗（HTTP ${response.status}）`;
+          throw new Error(serverMessage);
+        }
+
+        if (!body || typeof body.ok !== 'boolean') {
+          throw new Error('API 回應格式不符合契約：缺少 ok:boolean');
+        }
+
+        if (!body.ok) {
+          throw new Error(body.message || '送出失敗，請稍後再試。');
+        }
+
+        return body;
+      }
+
+      function setFormError(message) {
+        if (!formError) return;
+        formError.textContent = message;
+        formError.classList.remove('hidden');
+      }
+
+      function clearFormError() {
+        if (!formError) return;
+        formError.textContent = '';
+        formError.classList.add('hidden');
+      }
+
+      if (contactForm && submitButton) {
+        contactForm.addEventListener('submit', async (e) => {
           e.preventDefault();
-          const token = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
-          if (!token) {
-            formError.classList.remove('hidden');
+
+          const configuredEndpoint = (contactForm.dataset.apiEndpoint || DEFAULT_API_ENDPOINT || '').trim();
+          if (!configuredEndpoint) {
+            setFormError('尚未設定 API endpoint，請先在 form 的 data-api-endpoint 填入後端網址。');
             return;
           }
-          formError.classList.add('hidden');
-          // 示意送出成功（實際部署時改串後端驗證 API）
-          contactForm.querySelector('#form-submit').disabled = true;
-          contactForm.querySelector('#form-submit').textContent = '傳送中…';
-          setTimeout(() => {
+
+          if (!contactForm.checkValidity()) {
+            setFormError('請完整填寫姓名、Email 與訊息內容。');
+            contactForm.reportValidity();
+            return;
+          }
+
+          const token = (typeof grecaptcha !== 'undefined') ? grecaptcha.getResponse() : '';
+          if (!token) {
+            setFormError('請先完成 reCAPTCHA 驗證。');
+            return;
+          }
+
+          clearFormError();
+          if (formSuccess) {
+            formSuccess.classList.add('hidden');
+          }
+
+          const originalText = submitButton.textContent;
+          submitButton.disabled = true;
+          submitButton.textContent = '傳送中...';
+
+          const payload = {
+            apiVersion: CONTACT_API_VERSION,
+            name: (document.getElementById('form-name')?.value || '').trim(),
+            email: (document.getElementById('form-email')?.value || '').trim(),
+            message: (document.getElementById('form-message')?.value || '').trim(),
+            recaptchaToken: token,
+            source: window.location.href,
+            submittedAt: new Date().toISOString()
+          };
+
+          try {
+            const response = await fetch(configuredEndpoint, {
+              method: 'POST',
+              headers: {
+                'Content-Type': CONTACT_REQUEST_CONTENT_TYPE
+              },
+              body: JSON.stringify(payload)
+            });
+
+            const result = await parseContactApiResponse(response);
+
             contactForm.reset();
-            grecaptcha.reset();
-            contactForm.querySelector('#form-submit').classList.add('hidden');
-            formSuccess.classList.remove('hidden');
-          }, 800);
+            if (typeof grecaptcha !== 'undefined') {
+              grecaptcha.reset();
+            }
+            if (formSuccess) {
+              formSuccess.classList.remove('hidden');
+            }
+          } catch (error) {
+            setFormError(error.message || '送出失敗，請稍後再試。');
+          } finally {
+            submitButton.disabled = false;
+            submitButton.textContent = originalText;
+          }
         });
       }
       const allAnnotations = document.querySelectorAll('.annotation-wrapper');
