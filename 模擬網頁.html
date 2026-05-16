@@ -1,0 +1,1908 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>丹淳 Danchun 官網提案 - 視覺引導版</title>
+
+  <!-- Tailwind CSS CDN -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  <!-- Phosphor Icons -->
+  <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
+  <!-- Google reCAPTCHA v2 -->
+  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          colors: {
+            morandi: {
+              50:  '#FDF8F7',
+              100: '#F7EDEC',
+              200: '#EDD4D2',
+              300: '#D9ADAA',
+              400: '#C27B72',   /* 主標示色 */
+              500: '#B8625A',   /* hover 深色 */
+              600: '#9E4F48',
+              700: '#7A3C36',
+            },
+            nature: {
+              50:  '#F4F5F2',
+              100: '#EAECE8',
+              200: '#D5DCD6',
+              300: '#8A9A8B',
+              500: '#5C715E',
+              600: '#4A5B4C',
+              800: '#2D332F',
+            }
+          },
+          fontFamily: {
+            serif: ['"Noto Serif TC"', 'Georgia', 'serif'],
+            sans:  ['"Noto Sans TC"', 'system-ui', 'sans-serif'],
+          }
+        }
+      }
+    }
+  </script>
+
+  <style>
+    body { scroll-behavior: smooth; }
+
+    /* ── Glass panel ── */
+    .glass-panel {
+      background: rgba(255, 255, 255, 0.88);
+      backdrop-filter: blur(14px);
+    }
+
+    /* ── 浮動動畫 ── */
+    .float-anim { animation: floating 4s ease-in-out infinite; }
+    @keyframes floating {
+      0%, 100% { transform: translateY(0); }
+      50%       { transform: translateY(-10px); }
+    }
+
+    /* ── 淡入動畫 ── */
+    .fade-in { animation: fadeInUp .6s ease-out forwards; opacity: 0; }
+    @keyframes fadeInUp {
+      from { opacity: 0; transform: translateY(16px); }
+      to   { opacity: 1; transform: translateY(0); }
+    }
+
+    /* ══════════════════════════════════════════
+       導覽列下拉選單 — 多層次動態導覽
+       ══════════════════════════════════════════ */
+    .nav-item {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      cursor: pointer;
+      transition: color .2s ease;
+    }
+    .nav-item:hover { color: var(--color-nature-600, #4A5B4C); }
+    .nav-item.has-dropdown::after {
+      content: '';
+      position: absolute;
+      left: 0;
+      right: 0;
+      bottom: -8px;
+      height: 2px;
+      border-radius: 9999px;
+      background: currentColor;
+      transform: scaleX(0);
+      transform-origin: center;
+      transition: transform .2s ease;
+    }
+    .nav-item:hover.has-dropdown::after,
+    .nav-item.expanded-menu.has-dropdown::after { transform: scaleX(1); }
+    
+    /* 第一層下拉菜單 */
+    .dropdown-menu-1 {
+      position: absolute;
+      top: 100%;
+      left: 0;
+      background: #fff;
+      border-radius: 14px;
+      box-shadow: 0 18px 40px rgba(45,51,47,.14);
+      border: 1px solid rgba(229,231,235,.95);
+      min-width: 180px;
+      padding: 10px 0;
+      margin-top: 10px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(-10px) scale(.985);
+      transform-origin: top left;
+      transition: opacity .24s ease, visibility .24s ease, transform .24s cubic-bezier(.175,.885,.32,1.15), box-shadow .24s ease;
+      z-index: 520;
+      pointer-events: none;
+    }
+    .dropdown-menu-1::before {
+      content: '';
+      position: absolute;
+      top: -20px;
+      left: 0;
+      right: 0;
+      height: 20px;
+      pointer-events: auto;
+      background: transparent;
+    }
+    .nav-item:hover .dropdown-menu-1 {
+      opacity: 1;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+      box-shadow: 0 22px 44px rgba(45,51,47,.18);
+      pointer-events: auto;
+    }
+    
+    /* 第二層下拉菜單 */
+    .dropdown-menu-2 {
+      position: absolute;
+      top: 0;
+      left: 100%;
+      background: #fff;
+      border-radius: 8px;
+      box-shadow: 0 8px 24px rgba(0,0,0,.12);
+      border: 1px solid #e5e7eb;
+      min-width: 160px;
+      padding: 8px 0;
+      margin-left: 4px;
+      opacity: 0;
+      visibility: hidden;
+      transform: translateX(-8px);
+      transition: opacity .25s ease, visibility .25s ease, transform .25s ease;
+      z-index: 521;
+      pointer-events: none;
+    }
+
+    /* 確保 Header、下拉選單與功能匡線層級高於 Hero */
+    #mock-header {
+      position: relative;
+      z-index: 500;
+    }
+    #hero-banner {
+      position: relative;
+      z-index: 1;
+    }
+    .dropdown-item:hover .dropdown-menu-2 {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0);
+      pointer-events: auto;
+    }
+    
+    /* 菜單項目 */
+    .dropdown-item {
+      position: relative;
+      padding: 10px 16px;
+      color: #4b5563;
+      font-size: .9rem;
+      cursor: pointer;
+      transition: background .2s ease, color .2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      white-space: nowrap;
+    }
+    .dropdown-item::before {
+      content: '';
+      position: absolute;
+      left: 10px;
+      top: 50%;
+      width: 4px;
+      height: 4px;
+      border-radius: 9999px;
+      background: #C27B72;
+      transform: translateY(-50%) scale(0);
+      transition: transform .2s ease, opacity .2s ease;
+      opacity: 0;
+    }
+    .dropdown-item:hover {
+      background: linear-gradient(90deg, rgba(242,244,241,.96), rgba(255,255,255,1));
+      color: #2D332F;
+      transform: translateX(4px);
+    }
+    .dropdown-item:hover::before {
+      transform: translateY(-50%) scale(1);
+      opacity: 1;
+    }
+    .dropdown-item.has-submenu::after {
+      content: '›';
+      margin-left: 10px;
+      font-size: 1.3rem;
+      color: #9ca3af;
+      transition: all .2s ease;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 20px;
+    }
+    .dropdown-item:hover.has-submenu::after {
+      transform: translateX(4px);
+      color: #4b5563;
+    }
+
+    /* 導航項目展開指示符 */
+    .nav-item.expanded-menu .dropdown-menu-1 {
+      opacity: 1 !important;
+      visibility: visible !important;
+      transform: translateY(0) !important;
+      pointer-events: auto !important;
+    }
+
+    /* ══════════════════════════════════════════
+       懸浮服務列表 — 類別卡片 accordion 展開
+       ══════════════════════════════════════════ */
+    .service-category {
+      width: 4.5rem;
+      max-height: 4.5rem;
+      overflow: hidden;
+      transition:
+        width .42s cubic-bezier(.175, .885, .32, 1.275),
+        max-height .55s ease,
+        background-color .3s ease;
+    }
+    #service-panel.has-open-category .service-category {
+      width: 13.2rem;
+      max-height: 4.5rem;
+    }
+    #service-panel.has-open-category .service-category.is-open {
+      width: 17.5rem;
+      max-height: 600px;
+    }
+    .service-category:hover,
+    .service-category.is-open {
+      width: 17.5rem;
+      max-height: 600px;
+      background-color: #9E4F48;   /* morandi-600 */
+      color: white;
+      border-color: #9E4F48;
+    }
+    .cat-icon-box { transition: all .5s ease; }
+    .service-category:hover .cat-icon-box,
+    .service-category.is-open .cat-icon-box {
+      background-color: #fff;
+      color: #9E4F48;
+      transform: rotate(360deg);
+    }
+
+    /* 子選單 */
+    .sub-menu {
+      opacity: 0;
+      transform: translateY(-8px);
+      transition: opacity .35s ease, transform .35s ease;
+      transition-delay: 0s;
+    }
+    .service-category:hover .sub-menu,
+    .service-category.is-open .sub-menu {
+      opacity: 1;
+      transform: translateY(0);
+      transition-delay: .18s;
+    }
+    #service-panel.has-open-category .service-category:not(.is-open) .sub-menu {
+      opacity: 0;
+      transform: translateY(-8px);
+      transition-delay: 0s;
+      pointer-events: none;
+    }
+
+    /* ══════════════════════════════════════════
+       標示匡 dimmed / active 狀態系統
+       ══════════════════════════════════════════ */
+    .annotation-wrapper { transition: all .35s ease; }
+
+    /* Dimmed（預設）：內容隱藏，虛線框淡化 */
+    .annotation-dimmed .annotation-content {
+      opacity: 0;
+      visibility: hidden;
+      transform: translateY(8px) scale(.95);
+      pointer-events: none;
+      transition: all .3s ease;
+    }
+    .annotation-dimmed .annotation-dash {
+      display: none !important;
+    }
+
+    /* Active（hover 觸發）：完整顯示 + 脈衝邊框 */
+    .annotation-active { z-index: 100 !important; }
+    .annotation-active .annotation-content {
+      opacity: 1 !important;
+      visibility: visible;
+      transform: translateY(0) scale(1);
+      transition: all .4s cubic-bezier(.175, .885, .32, 1.275);
+    }
+    .annotation-active .annotation-dash {
+      display: none !important;
+    }
+    @keyframes pulseBorder {
+      0%   { box-shadow: 0 0 0 0   rgba(194,123,114,.65); }
+      70%  { box-shadow: 0 0 0 10px rgba(194,123,114,0); }
+      100% { box-shadow: 0 0 0 0   rgba(194,123,114,0); }
+    }
+
+    /* ── 莫蘭迪紅標示匡背景 ── */
+    .ann-box {
+      background: rgba(194, 123, 114, .95);
+      backdrop-filter: blur(10px);
+      border: 1.5px solid rgba(255,255,255,.28);
+    }
+
+    /* ── 功能元素虛線框標示 ── */
+    .feature-dash-border {
+      position: relative;
+      isolation: isolate;
+    }
+    .feature-dash-border::before {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border: 2px dashed #C27B72;
+      border-radius: 12px;
+      pointer-events: none;
+      opacity: 0.18;
+      animation: none;
+      z-index: 0;
+    }
+    .feature-dash-border > * {
+      position: relative;
+      z-index: 1;
+    }
+    .feature-dash-border.is-active::before {
+      opacity: 1;
+      animation: pulseBorder 2s infinite;
+    }
+    .feature-dash-border.is-dimmed::before {
+      opacity: 0.18;
+      animation: none;
+      border-style: dashed;
+    }
+    
+    /* 特殊元素的虛線框調整 */
+    button.feature-dash-border.is-active::before {
+      border-radius: 9999px;
+      inset: -12px;
+    }
+    
+    #hero-banner.feature-dash-border.is-active::before {
+      border-radius: 0;
+      inset: -16px;
+    }
+
+    /* ── 技術卡片高亮 ── */
+    .card-active {
+      transform: scale(1.04) translateY(-2px);
+      z-index: 50;
+      box-shadow: 0 14px 36px rgba(0,0,0,.1), 0 0 0 3px #C27B72 !important;
+      border-color: #C27B72 !important;
+      transition: all .3s cubic-bezier(.175,.885,.32,1.275);
+    }
+
+    /* ── 微互動演示：暗化疊層 ── */
+    .demo-hover-card {
+      position: relative;
+      overflow: hidden;
+    }
+    .demo-hover-overlay {
+      position: absolute;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.3);
+      opacity: 0;
+      transition: opacity 0.4s ease;
+      pointer-events: none;
+    }
+    .demo-hover-card:hover .demo-hover-overlay,
+    .demo-hover-card.is-demoing .demo-hover-overlay {
+      opacity: 1;
+    }
+    .demo-hover-card.is-demoing {
+      cursor: not-allowed;
+    }
+
+    /* ── 切換按鈕「全部顯示」狀態 ── */
+    .btn-show-all {
+      background: #B8625A;
+      color: #fff;
+      box-shadow: 0 4px 14px rgba(184,98,90,.35);
+    }
+    .btn-show-all:hover { background: #9E4F48; }
+
+    /* ══════════════════════════════════════════
+       Hero 區背景與弧線波浪效果
+       ══════════════════════════════════════════ */
+    #hero-banner {
+      background: url('hero模擬.png') center 50% / cover no-repeat;
+      will-change: background-position;
+    }
+    body.mobile-preview-mode #hero-banner {
+      background-position: 80% 30%;
+    }
+
+    /* ── Sticky CTA：與右側服務列表同層級浮動，定位於模擬框內 ── */
+    .sticky-cta-container {
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 120;
+      pointer-events: none;
+    }
+    .sticky-cta-container > #floating-cta-wrap {
+      pointer-events: auto;
+    }
+
+    /* ── Mobile Menu：視覺強化 ── */
+    .mobile-menu-toggle-btn {
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(246,247,245,0.96));
+      box-shadow: 0 10px 24px rgba(45, 51, 47, 0.08);
+    }
+    .mobile-menu-toggle-btn.is-open {
+      border-color: #C27B72;
+      color: #9E4F48;
+      box-shadow: 0 14px 28px rgba(194,123,114,0.18);
+    }
+    .mobile-menu-surface {
+      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,248,0.96));
+      border: 1px solid rgba(213, 220, 214, 0.85);
+      box-shadow: 0 26px 48px rgba(45, 51, 47, 0.14);
+      backdrop-filter: blur(16px);
+    }
+    .mobile-menu-section {
+      border: 1px solid rgba(213, 220, 214, 0.75);
+      background: rgba(255,255,255,0.78);
+      border-radius: 20px;
+      padding: 16px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+    }
+    .mobile-menu-link {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      color: #4b5563;
+      background: rgba(247, 249, 247, 0.72);
+      transition: transform .2s ease, background-color .2s ease, color .2s ease;
+    }
+    .mobile-menu-link:hover {
+      background: rgba(234, 236, 232, 0.95);
+      color: #2D332F;
+      transform: translateX(2px);
+    }
+    .mobile-menu-pill {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      padding: 10px 14px;
+      border-radius: 9999px;
+      border: 1px solid rgba(213, 220, 214, 0.9);
+      background: rgba(255,255,255,0.86);
+      color: #5f6b63;
+      font-size: 12px;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      transition: all .2s ease;
+    }
+    .mobile-menu-pill:hover {
+      border-color: #C27B72;
+      color: #9E4F48;
+      background: rgba(253, 248, 247, 0.98);
+    }
+    .mobile-menu-panel-enter {
+      animation: mobileMenuEnter .26s ease-out;
+      transform-origin: top right;
+    }
+    @keyframes mobileMenuEnter {
+      from {
+        opacity: 0;
+        transform: translateY(-10px) scale(0.98);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+      }
+    }
+
+    /* ── RWD 預覽：模擬手機寬度 ── */
+    .preview-browser {
+      transition: max-width .45s ease, width .45s ease, margin .45s ease;
+    }
+    .preview-browser.mobile-sim {
+      max-width: 430px;
+      width: 100%;
+      margin-left: auto;
+      margin-right: auto;
+    }
+    .preview-browser.mobile-sim nav.hidden.lg\:flex {
+      display: none !important;
+    }
+    body.mobile-preview-mode #mock-header nav.hidden.lg\:flex {
+      display: none !important;
+    }
+    body.mobile-preview-mode #mock-header #mobile-menu-toggle {
+      display: flex !important;
+    }
+    body.mobile-preview-mode #mock-header #mobile-menu-panel:not(.hidden) {
+      display: block !important;
+    }
+
+    /* ── 手機版優化：實機與 RWD 模擬皆適用 ── */
+    body.mobile-preview-mode #tech-grid {
+      grid-template-columns: 1fr !important;
+      gap: 14px !important;
+    }
+    body.mobile-preview-mode #tech-grid [id^="card-"] {
+      padding: 16px !important;
+    }
+    body.mobile-preview-mode #tech-grid [id^="card-"] h3 {
+      font-size: 1.25rem !important;
+      line-height: 1.45 !important;
+      word-break: break-word;
+    }
+    body.mobile-preview-mode #tech-grid [id^="card-"] p {
+      margin-left: 0 !important;
+      line-height: 1.7;
+    }
+    body.mobile-preview-mode #contact-map-grid,
+    body.mobile-preview-mode #preview-browser .cta-grid,
+    body.mobile-preview-mode #preview-browser .footer-grid {
+      grid-template-columns: 1fr !important;
+    }
+
+    /* 手機預覽模式：紅色說明匡移到版面外側，避免重疊內容 */
+    body.mobile-preview-mode .annotation-wrapper {
+      position: fixed !important;
+      transform: none !important;
+      width: 240px !important;
+      z-index: 140 !important;
+    }
+    body.mobile-preview-mode .annotation-wrapper .annotation-dash {
+      display: none !important;
+    }
+
+    @media (max-width: 768px) {
+      #hero-banner {
+        background-position: 58% 50%;
+      }
+      .service-category {
+        display: none;
+      }
+      .sticky-cta-container { z-index: 120; }
+      #tech-grid {
+        grid-template-columns: 1fr !important;
+        gap: 14px !important;
+      }
+      #tech-grid [id^="card-"] {
+        padding: 16px !important;
+      }
+      #tech-grid [id^="card-"] h3 {
+        font-size: 1.2rem !important;
+        line-height: 1.45 !important;
+        word-break: break-word;
+      }
+      #tech-grid [id^="card-"] p {
+        margin-left: 0 !important;
+        line-height: 1.7;
+      }
+
+      /* 手機版：CTA 與 Footer 可讀性優化 */
+      #preview-browser .cta-panel {
+        padding: 20px !important;
+        border-radius: 20px !important;
+      }
+      #preview-browser .cta-panel h3 {
+        font-size: 1.65rem !important;
+        line-height: 1.35 !important;
+      }
+      #preview-browser .cta-actions {
+        flex-direction: column;
+        align-items: stretch;
+      }
+      #preview-browser .cta-actions button {
+        width: 100%;
+        text-align: center;
+      }
+      #preview-browser .cta-stats {
+        padding: 16px !important;
+      }
+      #preview-browser footer {
+        padding: 28px 20px !important;
+      }
+      #preview-browser footer .max-w-5xl {
+        gap: 18px !important;
+      }
+      #preview-browser footer ul li {
+        word-break: break-word;
+        line-height: 1.5;
+      }
+      #preview-browser .footer-meta {
+        flex-direction: column;
+        align-items: flex-start;
+      }
+    }
+  </style>
+</head>
+
+<body class="bg-nature-50 text-gray-800 font-sans pb-24 overflow-x-hidden">
+
+
+  <!-- ═══════════════════════════════════════════════════
+       右側懸浮服務列表（4 大類，accordion 展開 + 子選單）
+       ═══════════════════════════════════════════════════ -->
+  <div id="service-panel" class="fixed right-0 top-[16%] z-[120] flex flex-col gap-3 pointer-events-none select-none">
+
+    <!-- ① 介面設計與體驗 -->
+    <div class="service-category bg-white text-morandi-700 rounded-l-2xl shadow-xl border border-morandi-200 border-r-0 pointer-events-auto">
+      <div class="flex items-center gap-4 p-3 min-w-[17.5rem]">
+        <div class="cat-icon-box min-w-[3rem] w-12 h-12 rounded-full bg-morandi-50 text-morandi-500 flex items-center justify-center text-2xl shadow-inner flex-shrink-0">
+          <i class="ph ph-paint-brush-broad"></i>
+        </div>
+        <div class="whitespace-nowrap">
+          <h4 class="font-bold text-sm tracking-wide">介面設計與體驗</h4>
+          <p class="text-[11px] opacity-60 mt-0.5">UI/UX Experience</p>
+        </div>
+      </div>
+      <div class="sub-menu px-5 pb-4">
+        <ul class="text-[13px] space-y-2.5 border-l border-white/25 pl-4 ml-3">
+          <li class="sub-item flex items-center gap-2 cursor-pointer hover:text-white/80 hover:translate-x-1 transition-all" data-target="ann-uiux-ci">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0"></div>全客製化品牌視覺 (CI)
+          </li>
+          <li class="sub-item flex items-center gap-2 cursor-pointer hover:text-white/80 hover:translate-x-1 transition-all" data-target="ann-uiux-nav">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0"></div>智慧型置頂選單 &amp; 動態導覽
+          </li>
+          <li class="sub-item flex items-center gap-2 cursor-pointer hover:text-white/80 hover:translate-x-1 transition-all" data-target="ann-uiux-hover">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0"></div>現代化微互動特效
+          </li>
+          <li class="sub-item flex items-center gap-2 cursor-pointer hover:text-white/80 hover:translate-x-1 transition-all" data-target="ann-uiux-rwd">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0"></div>RWD 跨裝置完美適配
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ② 轉換策略與成效 -->
+    <div class="service-category bg-white text-morandi-700 rounded-l-2xl shadow-xl border border-morandi-200 border-r-0 pointer-events-auto">
+      <div class="flex items-center gap-4 p-3 min-w-[17.5rem]">
+        <div class="cat-icon-box min-w-[3rem] w-12 h-12 rounded-full bg-morandi-50 text-morandi-500 flex items-center justify-center text-2xl shadow-inner flex-shrink-0">
+          <i class="ph ph-chart-line-up"></i>
+        </div>
+        <div class="whitespace-nowrap">
+          <h4 class="font-bold text-sm tracking-wide">轉換策略與成效</h4>
+          <p class="text-[11px] opacity-60 mt-0.5">Conversion Strategy</p>
+        </div>
+      </div>
+      <div class="sub-menu px-5 pb-4">
+        <ul class="text-[13px] space-y-2.5 border-l border-white/25 pl-4 ml-3">
+          <li class="sub-item flex items-center gap-2 cursor-pointer hover:text-white/80 hover:translate-x-1 transition-all" data-target="ann-conv-lang">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0"></div>多語系無縫擴充架構
+          </li>
+          <li class="sub-item flex items-center gap-2 cursor-pointer hover:text-white/80 hover:translate-x-1 transition-all" data-target="ann-conv-form">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0"></div>自訂防垃圾廣告詢價表單
+          </li>
+          <li class="sub-item flex items-center gap-2 cursor-pointer hover:text-white/80 hover:translate-x-1 transition-all" data-target="ann-conv-map">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0"></div>社群矩陣與地圖深度整合
+          </li>
+          <li class="sub-item flex items-center gap-2 cursor-pointer hover:text-white/80 hover:translate-x-1 transition-all" data-target="ann-conv-cta">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0"></div>常駐型行動呼籲 (Sticky CTAs)
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ③ 開發技術與 SEO -->
+    <div class="service-category bg-white text-morandi-700 rounded-l-2xl shadow-xl border border-morandi-200 border-r-0 pointer-events-auto">
+      <div class="flex items-center gap-4 p-3 min-w-[17.5rem]">
+        <div class="cat-icon-box min-w-[3rem] w-12 h-12 rounded-full bg-morandi-50 text-morandi-500 flex items-center justify-center text-2xl shadow-inner flex-shrink-0">
+          <i class="ph ph-lightning"></i>
+        </div>
+        <div class="whitespace-nowrap">
+          <h4 class="font-bold text-sm tracking-wide">開發技術與 SEO</h4>
+          <p class="text-[11px] opacity-60 mt-0.5">Development &amp; SEO</p>
+        </div>
+      </div>
+      <div class="sub-menu px-5 pb-4">
+        <ul class="text-[13px] space-y-2.5 border-l border-white/25 pl-4 ml-3">
+          <li class="sub-item flex items-center gap-2 cursor-pointer hover:text-white/80 hover:translate-x-1 transition-all" data-target="card-tech-cdn">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0"></div>CDN 國際節點極速分發
+          </li>
+          <li class="sub-item flex items-center gap-2 cursor-pointer hover:text-white/80 hover:translate-x-1 transition-all" data-target="card-tech-img">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0"></div>次世代圖片壓縮技術
+          </li>
+          <li class="sub-item flex items-center gap-2 cursor-pointer hover:text-white/80 hover:translate-x-1 transition-all" data-target="card-tech-seo">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0"></div>技術型 SEO 標籤佈署
+          </li>
+          <li class="sub-item flex items-center gap-2 cursor-pointer hover:text-white/80 hover:translate-x-1 transition-all" data-target="card-tech-social">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0"></div>社群分享優化 (OG Tags)
+          </li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- ④ 維運管理與資安 -->
+    <div class="service-category bg-white text-morandi-700 rounded-l-2xl shadow-xl border border-morandi-200 border-r-0 pointer-events-auto">
+      <div class="flex items-center gap-4 p-3 min-w-[17.5rem]">
+        <div class="cat-icon-box min-w-[3rem] w-12 h-12 rounded-full bg-morandi-50 text-morandi-500 flex items-center justify-center text-2xl shadow-inner flex-shrink-0">
+          <i class="ph ph-shield-check"></i>
+        </div>
+        <div class="whitespace-nowrap">
+          <h4 class="font-bold text-sm tracking-wide">維運管理與資安</h4>
+          <p class="text-[11px] opacity-60 mt-0.5">Ops &amp; Security</p>
+        </div>
+      </div>
+      <div class="sub-menu px-5 pb-4">
+        <ul class="text-[13px] space-y-2.5 border-l border-white/25 pl-4 ml-3">
+          <li class="sub-item flex items-center gap-2 cursor-pointer hover:text-white/80 hover:translate-x-1 transition-all" data-target="card-sec-serverless">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0"></div>無伺服器軍規防駭架構
+          </li>
+          <li class="sub-item flex items-center gap-2 cursor-pointer hover:text-white/80 hover:translate-x-1 transition-all" data-target="card-sec-cms">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0"></div>輕量級智能內容後台 (CMS)
+          </li>
+        </ul>
+      </div>
+    </div>
+
+  </div><!-- / float service list -->
+
+  <!-- ═══════════════════════════════════════════════════
+       浮動 CTA（與右側服務列表同層級）
+       ═══════════════════════════════════════════════════ -->
+  <div id="sticky-cta-container" class="sticky-cta-container">
+    <div id="floating-cta-wrap" class="relative feature-dash-border is-dimmed">
+      <div class="w-16 h-16 bg-nature-500 text-white rounded-full flex items-center justify-center shadow-xl relative z-10">
+        <i class="ph-fill ph-chat-teardrop-dots text-3xl"></i>
+      </div>
+      <!-- ▌標示：常駐 CTA -->
+      <div id="ann-conv-cta" class="annotation-wrapper absolute bottom-0 right-full mr-8 w-72 z-50">
+        <div class="absolute -inset-2 rounded-full annotation-dash pointer-events-none border-2"></div>
+        <div class="annotation-content ann-box relative p-4 rounded-xl shadow-2xl">
+          <div class="flex items-center gap-2 mb-2 pb-2 border-b border-white/20">
+            <div class="w-2 h-2 rounded-full bg-white animate-pulse flex-shrink-0"></div>
+            <h4 class="font-bold text-sm text-white">常駐型行動呼籲 (Sticky CTAs)</h4>
+          </div>
+          <p class="text-xs text-white/85 leading-relaxed">固定懸浮的客服或電話按鈕，極大化客戶諮詢率，打造24小時自動接單業務員。</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════
+       頂部控制列
+       ═══════════════════════════════════════ -->
+  <div class="sticky top-0 z-[60] glass-panel border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm">
+    <div class="flex items-center gap-3">
+      <div class="w-10 h-10 rounded-full bg-nature-500 text-white flex items-center justify-center shadow-lg flex-shrink-0">
+        <i class="ph-fill ph-crown text-xl"></i>
+      </div>
+      <div>
+        <h1 class="text-2xl font-serif font-bold text-nature-800">丹淳 Danchun 官網提案</h1>
+        <p class="text-sm text-gray-500 mt-0.5">
+          將滑鼠移至<span class="text-morandi-500 font-semibold">右側服務列表</span>，檢視丹淳品牌官網的互動提案重點
+        </p>
+      </div>
+    </div>
+    <button id="toggleAnnotations"
+      class="flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all bg-nature-50 border border-nature-200 text-nature-700 hover:bg-nature-100">
+      <i class="ph ph-eye text-lg"></i>
+      <span>強制顯示所有標示</span>
+    </button>
+  </div>
+
+
+  <!-- ═══════════════════════════════════════
+       主內容
+       ═══════════════════════════════════════ -->
+  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-12">
+
+    <!-- 區塊一標題 -->
+    <div class="mb-8 flex items-center gap-3 fade-in">
+      <div class="w-1.5 h-8 bg-nature-500 rounded-full flex-shrink-0"></div>
+      <h2 class="text-2xl font-bold text-nature-800">前端視覺與轉換動線 (UI/UX &amp; Conversion)</h2>
+    </div>
+
+    <!-- ─────────────────────────────────────────
+         模擬瀏覽器視窗
+         ───────────────────────────────────────── -->
+    <div id="preview-browser" class="preview-browser bg-white rounded-t-xl rounded-b-lg shadow-2xl overflow-visible border border-gray-200 mb-24 relative fade-in" style="animation-delay:.1s">
+
+      <!-- ▌標示：導覽列 / 置頂選單 (移到外部，避免 overflow 裁切) -->
+      <div id="ann-uiux-nav" class="annotation-wrapper absolute -top-[60px] left-1/2 -translate-x-1/2 w-[30rem] z-[9999]" style="pointer-events: auto;">
+        <div class="absolute inset-0 rounded-lg annotation-dash pointer-events-none border-2"></div>
+        <div class="annotation-content ann-box relative p-4 rounded-xl shadow-2xl">
+          <div class="flex items-center gap-2 mb-2 pb-2 border-b border-white/20">
+            <div class="w-2 h-2 rounded-full bg-white animate-pulse flex-shrink-0"></div>
+            <h4 class="font-bold text-base text-white">智慧型置頂選單 &amp; 動態導覽</h4>
+          </div>
+          <p class="text-sm text-white/85 leading-relaxed">包含多層次下拉選單。向下捲動時，導覽列自動縮小並吸附於螢幕頂端，永遠觸手可及。</p>
+        </div>
+      </div>
+
+      <!-- 瀏覽器標題列 -->
+      <div class="bg-gray-100 px-4 py-3 border-b border-gray-200 flex items-center gap-2">
+        <div class="w-3 h-3 rounded-full bg-red-400"></div>
+        <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
+        <div class="w-3 h-3 rounded-full bg-green-400"></div>
+        <div class="ml-4 bg-white px-4 py-1.5 rounded text-xs text-gray-400 font-mono flex-1 max-w-sm text-center border border-gray-200 shadow-sm">
+          danchun.com.tw
+        </div>
+      </div>
+
+      <!-- 模擬網頁內容區 -->
+      <div class="relative bg-white pb-24 overflow-visible">
+
+        <!-- ▌標示：RWD 跨裝置（floating badge） -->
+        <div id="ann-uiux-rwd" class="annotation-wrapper absolute top-4 left-4 z-40">
+          <div class="absolute -inset-3 rounded-full annotation-dash pointer-events-none border-2"></div>
+          <div class="annotation-content float-anim bg-morandi-400 text-white text-xs px-4 py-2 rounded-full font-bold shadow-lg flex items-center gap-2 relative">
+            <i class="ph ph-devices text-base"></i>
+            支援 RWD 跨裝置完美適配
+          </div>
+        </div>
+
+        <!-- ── Mock Header ── -->
+        <div class="relative">
+          <header id="mock-header" class="px-8 py-5 flex justify-between items-center bg-white border-b border-gray-100 shadow-sm relative feature-dash-border is-dimmed">
+            <!-- Logo -->
+            <div class="flex items-center gap-2 text-nature-500">
+              <i class="ph ph-flower-lotus text-3xl"></i>
+              <div class="font-serif font-bold text-xl leading-none tracking-widest text-nature-800">
+                丹淳<br><span class="text-sm font-sans tracking-[.2em] text-nature-500">DANCHUN</span>
+              </div>
+            </div>
+            <!-- Nav with Dropdowns -->
+            <nav class="hidden lg:flex gap-8 text-sm font-medium text-gray-500 relative z-40">
+              
+              <!-- 關於我們 with dropdown -->
+              <div class="nav-item has-dropdown">
+                <span>關於我們</span>
+                <div class="dropdown-menu-1">
+                  <div class="dropdown-item">公司簡介</div>
+                  <div class="dropdown-item">服務理念</div>
+                  <div class="dropdown-item">團隊介紹</div>
+                  <div class="dropdown-item">合作流程</div>
+                  <div class="dropdown-item">媒體報導</div>
+                </div>
+              </div>
+              
+              <!-- 產品系列 with dropdown -->
+              <div class="nav-item has-dropdown">
+                <span>產品系列</span>
+                <div class="dropdown-menu-1">
+                  <div class="dropdown-item has-submenu">
+                    <span>網站設計方案</span>
+                    <div class="dropdown-menu-2">
+                      <div class="dropdown-item">形象官網設計</div>
+                      <div class="dropdown-item">品牌網站改版</div>
+                      <div class="dropdown-item">一頁式轉換頁</div>
+                      <div class="dropdown-item">RWD 響應式網站</div>
+                    </div>
+                  </div>
+                  <div class="dropdown-item has-submenu">
+                    <span>數位整合服務</span>
+                    <div class="dropdown-menu-2">
+                      <div class="dropdown-item">SEO 技術優化</div>
+                      <div class="dropdown-item">內容後台建置</div>
+                      <div class="dropdown-item">GA 成效追蹤</div>
+                      <div class="dropdown-item">網站維運託管</div>
+                    </div>
+                  </div>
+                  <div class="dropdown-item">企業客製開發</div>
+                  <div class="dropdown-item">跨部門系統串接</div>
+                </div>
+              </div>
+              
+              <!-- 最新消息 with dropdown -->
+              <div class="nav-item has-dropdown">
+                <span>最新消息</span>
+                <div class="dropdown-menu-1">
+                  <div class="dropdown-item">案例更新</div>
+                  <div class="dropdown-item">技術分享</div>
+                  <div class="dropdown-item">產業觀點</div>
+                  <div class="dropdown-item">團隊專欄</div>
+                </div>
+              </div>
+              
+              <!-- 聯絡我們 with dropdown -->
+              <div class="nav-item has-dropdown">
+                <span>聯絡我們</span>
+                <div class="dropdown-menu-1">
+                  <div class="dropdown-item">聯絡客服</div>
+                  <div class="dropdown-item">專案諮詢預約</div>
+                  <div class="dropdown-item">合作洽談</div>
+                  <div class="dropdown-item">常見問題</div>
+                </div>
+              </div>
+            </nav>
+            <!-- Icons -->
+            <div class="flex items-center gap-4 text-gray-500">
+
+              <!-- 語言按鈕 + 標示：多語系 -->
+              <div id="lang-switch" class="relative">
+                <div id="lang-switch-btn" class="flex items-center gap-1 text-sm border border-gray-200 px-2 py-1 rounded hover:bg-gray-50 cursor-pointer transition-colors relative z-10 feature-dash-border is-dimmed">
+                  <i class="ph ph-globe-hemisphere-west text-lg"></i> 中文
+                </div>
+                <div id="ann-conv-lang" class="annotation-wrapper absolute top-full mt-4 right-0 w-64 z-50">
+                  <div class="absolute -inset-2 rounded-lg annotation-dash pointer-events-none border-2"></div>
+                  <div class="annotation-content ann-box relative p-4 rounded-xl shadow-2xl">
+                    <div class="flex items-center gap-2 mb-2 pb-2 border-b border-white/20">
+                      <div class="w-2 h-2 rounded-full bg-white animate-pulse flex-shrink-0"></div>
+                      <h4 class="font-bold text-sm text-white">多語系無縫擴充架構</h4>
+                    </div>
+                    <p class="text-xs text-white/85 leading-relaxed">預留多國語系切換介面與底層架構，方便未來無痛擴展國際市場。</p>
+                  </div>
+                </div>
+              </div>
+
+              <i class="ph ph-magnifying-glass text-xl"></i>
+              <i class="ph ph-envelope-simple text-xl"></i>
+              <button id="mobile-menu-toggle" class="mobile-menu-toggle-btn lg:hidden w-14 h-14 rounded-2xl border border-gray-200 flex items-center justify-center transition-colors" aria-label="開啟選單" aria-expanded="false" aria-controls="mobile-menu-panel">
+                <i class="ph ph-list text-2xl"></i>
+              </button>
+            </div>
+
+            <!-- Mobile Menu -->
+            <div id="mobile-menu-panel" class="lg:hidden hidden absolute top-full left-4 right-4 mt-4 z-[560]">
+              <div class="mobile-menu-surface mobile-menu-panel-enter rounded-[28px] p-4 sm:p-5 text-sm text-gray-700 overflow-hidden">
+                <div class="flex items-center justify-between gap-4 px-2 pb-4 mb-4 border-b border-nature-100">
+                  <div>
+                    <p class="text-[11px] tracking-[0.24em] uppercase text-nature-500">Mobile Navigation</p>
+                    <p class="text-lg font-bold text-nature-800 mt-1">快速瀏覽丹淳網站架構</p>
+                  </div>
+                  <div class="w-12 h-12 rounded-2xl bg-nature-50 text-nature-600 flex items-center justify-center border border-nature-100 shadow-sm">
+                    <i class="ph ph-squares-four text-2xl"></i>
+                  </div>
+                </div>
+
+                <div class="space-y-3">
+                  <section class="mobile-menu-section">
+                    <div class="flex items-center justify-between mb-3">
+                      <h3 class="font-bold text-lg text-nature-800">關於我們</h3>
+                      <span class="text-[11px] tracking-[0.18em] uppercase text-nature-400">About</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2.5 text-sm">
+                      <a href="#" class="mobile-menu-link"><span>公司簡介</span><i class="ph  text-base"></i></a>
+                      <a href="#" class="mobile-menu-link"><span>服務理念</span><i class="ph  text-base"></i></a>
+                      <a href="#" class="mobile-menu-link"><span>團隊介紹</span><i class="ph  text-base"></i></a>
+                      <a href="#" class="mobile-menu-link"><span>合作流程</span><i class="ph  text-base"></i></a>
+                    </div>
+                  </section>
+
+                  <section class="mobile-menu-section">
+                    <div class="flex items-center justify-between mb-3">
+                      <h3 class="font-bold text-lg text-nature-800">網站設計方案</h3>
+                      <span class="text-[11px] tracking-[0.18em] uppercase text-nature-400">Services</span>
+                    </div>
+                    <div class="grid grid-cols-2 gap-2.5 text-sm">
+                      <a href="#" class="mobile-menu-link"><span>形象官網設計</span><i class="ph  text-base"></i></a>
+                      <a href="#" class="mobile-menu-link"><span>品牌網站改版</span><i class="ph  text-base"></i></a>
+                      <a href="#" class="mobile-menu-link"><span>一頁式轉換頁</span><i class="ph  text-base"></i></a>
+                      <a href="#" class="mobile-menu-link"><span>RWD 響應式網站</span><i class="ph  text-base"></i></a>
+                    </div>
+                  </section>
+
+                  <div class="flex flex-wrap gap-2 pt-1">
+                    <a href="#" class="mobile-menu-pill">最新消息</a>
+                    <a href="#" class="mobile-menu-pill">聯絡我們</a>
+                    <a href="#" class="mobile-menu-pill">專案諮詢</a>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </header>
+
+          <!-- ── Mock Hero Banner ── -->
+        <div id="hero-banner" class="relative w-full min-h-[560px] flex flex-col items-center justify-center text-center px-6 pt-32 pb-60 overflow-hidden feature-dash-border is-dimmed">
+          <!-- 背景裝飾 -->
+          <div class="absolute -left-24 -top-24 w-80 h-80 bg-white/100 rounded-full blur-3xl float-anim pointer-events-none"></div>
+          <div class="absolute right-8 bottom-20 w-96 h-96 bg-nature-300/20 rounded-full blur-3xl float-anim pointer-events-none" style="animation-delay:-2s"></div>
+
+          <p class="text-xs md:text-sm tracking-[0.35em] text-nature-600 uppercase mb-4 z-10">Danchun Web Design Studio</p>
+          <h2 class="text-4xl md:text-6xl font-serif font-bold text-nature-800 mb-5 tracking-[0.18em] z-10 drop-shadow-sm leading-tight max-w-4xl">
+            丹淳・品牌網站設計專家
+          </h2>
+          <p class="text-base md:text-lg text-gray-600 tracking-[0.12em] mb-10 z-10 max-w-2xl leading-relaxed">專注企業官網、轉換型頁面與技術優化，讓你的網站不只好看，更能穩定帶來詢問與訂單。</p>
+
+          <!-- 按鈕 + ▌標示：微互動 -->
+          <div id="hero-cta" class="relative z-10">
+            <button id="hero-cta-btn" class="bg-nature-500 text-white px-12 py-4 rounded-full text-lg tracking-widest hover:bg-nature-600 transition-all shadow-lg cursor-default feature-dash-border is-dimmed">
+              查看網站設計方案
+            </button>
+            <div id="ann-uiux-hover" class="annotation-wrapper absolute top-1/2 left-full ml-6 -translate-y-1/2 w-64 z-50">
+              <div class="absolute -inset-4 rounded-full annotation-dash pointer-events-none border-2"></div>
+              <div class="annotation-content ann-box relative p-4 rounded-xl shadow-2xl float-anim">
+                <div class="flex items-center gap-2 mb-2 pb-2 border-b border-white/20">
+                  <div class="w-2 h-2 rounded-full bg-white animate-pulse flex-shrink-0"></div>
+                  <h4 class="font-bold text-sm text-white">現代化微互動特效</h4>
+                </div>
+                <p class="text-xs text-white/85 leading-relaxed">滑鼠懸停特效 (Hover Effects)、區塊捲動淡入，營造國際級質感。</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- ▌標示：品牌視覺 CI -->
+          <div id="ann-uiux-ci" class="annotation-wrapper absolute top-10 left-10 w-72 z-50">
+            <div class="absolute inset-4 rounded-lg annotation-dash pointer-events-none border-2"></div>
+            <div class="annotation-content ann-box relative p-4 rounded-xl shadow-2xl">
+              <div class="flex items-center gap-2 mb-2 pb-2 border-b border-white/20">
+                <div class="w-2 h-2 rounded-full bg-white animate-pulse flex-shrink-0"></div>
+                <h4 class="font-bold text-sm text-white">全客製化品牌視覺 (CI)</h4>
+              </div>
+              <p class="text-xs text-white/85 leading-relaxed">依據企業識別打造專屬配色、字體與排版，絕不使用僵化的公版框架。</p>
+            </div>
+          </div>
+
+          <!-- 底部弧線裝飾 (左低右高、凹向上) -->
+          <div class="absolute -bottom-3 md:-bottom-2 left-0 w-full overflow-hidden leading-none z-0" aria-hidden="true">
+            <!-- 一體成形：上方弧形 + 下半矩形 -->
+            <svg class="relative block w-full h-[170px] md:h-[210px]" preserveAspectRatio="none" viewBox="0 0 1440 240" fill="none" xmlns="http://www.w3.org/2000/svg">
+              <path d="M0,194 Q500,268 1440,14 L1440,240 L0,240 Z" fill="#FFFFFF"></path>
+            </svg>
+          </div>
+        </div>
+
+    <!-- ─────────────────────────────────────────
+         區塊二：底層技術與資安
+         ───────────────────────────────────────── -->
+    <div class="mt-16 mb-8 max-w-5xl mx-auto px-8 flex items-center gap-3 fade-in" style="animation-delay:.2s">
+      <div class="w-1.5 h-8 bg-nature-500 rounded-full flex-shrink-0"></div>
+      <h2 class="text-2xl font-bold text-nature-800">頂尖底層技術與最高資安防護 (Tech &amp; Security)</h2>
+    </div>
+
+    <div id="tech-grid" class="max-w-5xl mx-auto px-8 grid md:grid-cols-2 lg:grid-cols-3 gap-6 mb-20">
+
+      <div id="card-tech-cdn" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">01</div>
+          <h3 class="text-lg font-bold text-nature-800">CDN 國際節點極速分發</h3>
+        </div>
+        <p class="text-gray-600 text-sm leading-relaxed ml-[4.5rem]">網站部署於全球內容傳遞網路（CDN），無論客戶在台灣或海外，皆能享受「不到一秒」的極速載入體驗。</p>
+      </div>
+
+      <div id="card-tech-img" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">02</div>
+          <h3 class="text-lg font-bold text-nature-800">次世代圖片壓縮技術</h3>
+        </div>
+        <p class="text-gray-600 text-sm leading-relaxed ml-[4.5rem]">全站圖片自動轉換為 Google 推薦的 WebP 等次世代格式，在保持高畫質的同時，將檔案體積壓縮至最小，大幅提升速度。</p>
+      </div>
+
+      <div id="card-tech-seo" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">03</div>
+          <h3 class="text-lg font-bold text-nature-800">技術型 SEO 標籤佈署</h3>
+        </div>
+        <p class="text-gray-600 text-sm leading-relaxed ml-[4.5rem]">每一個頁面皆可獨立設定 SEO 標題（Meta Title）與描述（Meta Description），並自動生成 Sitemap 提交給 Google。</p>
+      </div>
+
+      <div id="card-tech-social" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">04</div>
+          <h3 class="text-lg font-bold text-nature-800">社群分享優化 (Open Graph)</h3>
+        </div>
+        <p class="text-gray-600 text-sm leading-relaxed ml-[4.5rem]">確保當您的網址被貼在 Line 或 Facebook 時，會自動抓取最完美的品牌縮圖與吸睛標題。</p>
+      </div>
+
+      <div id="card-sec-serverless" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">05</div>
+          <h3 class="text-lg font-bold text-nature-800">無伺服器軍規防駭架構</h3>
+        </div>
+        <p class="text-gray-600 text-sm leading-relaxed ml-[4.5rem]">採用現代化靜態架構，徹底捨棄傳統資料庫。因沒有資料庫後門，駭客無從進行 SQL 注入，提供最高級別資安。</p>
+      </div>
+
+      <div id="card-sec-cms" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
+        <div class="flex items-center gap-4 mb-4">
+          <div class="bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">06</div>
+          <h3 class="text-lg font-bold text-nature-800">輕量級智能內容後台 (Headless CMS)</h3>
+        </div>
+        <p class="text-gray-600 text-sm leading-relaxed ml-[4.5rem]">針對「最新消息」或「作品案例」提供如 Notion 般直覺的無頭式後台，自動更新網頁且絕對不會破壞首頁排版。</p>
+      </div>
+
+    </div><!-- / grid -->
+        
+        <!-- ── Mock Bottom（表單 + 地圖） ── -->
+        <div id="contact-map-grid" class="max-w-5xl mx-auto mt-24 px-8 grid md:grid-cols-2 gap-12">
+
+          <!-- 表單 -->
+          <div id="form-card" class="relative bg-white p-8 rounded-2xl shadow-md border border-gray-100 hover:shadow-xl transition-shadow duration-300 overflow-visible feature-dash-border is-dimmed">
+            <h3 class="text-xl font-bold mb-6 text-nature-800 flex items-center gap-2">
+              <i class="ph-fill ph-envelope-open text-nature-500"></i> 聯絡我們
+            </h3>
+            <form id="contact-form" class="space-y-4" novalidate>
+              <input
+                type="text" name="name" id="form-name" required
+                placeholder="請輸入您的姓名"
+                class="w-full h-12 bg-gray-50 border border-gray-200 rounded-lg px-4 text-sm text-gray-700 placeholder-gray-400 outline-none focus:border-nature-400 focus:ring-2 focus:ring-nature-100 transition"
+              />
+              <input
+                type="email" name="email" id="form-email" required
+                placeholder="請輸入 Email"
+                class="w-full h-12 bg-gray-50 border border-gray-200 rounded-lg px-4 text-sm text-gray-700 placeholder-gray-400 outline-none focus:border-nature-400 focus:ring-2 focus:ring-nature-100 transition"
+              />
+              <textarea
+                name="message" id="form-message" required rows="4"
+                placeholder="訊息內容..."
+                class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 placeholder-gray-400 outline-none focus:border-nature-400 focus:ring-2 focus:ring-nature-100 transition resize-none"
+              ></textarea>
+
+              <!-- reCAPTCHA v2 checkbox widget -->
+              <div class="flex justify-start">
+                <div class="g-recaptcha" data-sitekey="6LeIxAcTAAAAAJcZVRqyHh71UMIEGNQ_MXjiZKhI"></div>
+              </div>
+
+              <!-- 驗證提示 -->
+              <p id="form-error" class="hidden text-xs text-red-500">*請先完成 reCAPTCHA 驗證</p>
+
+              <!-- 送出按鈕 -->
+              <button
+                type="submit" id="form-submit"
+                class="w-full h-12 bg-nature-500 hover:bg-nature-600 active:bg-nature-700 text-white rounded-lg text-sm font-bold tracking-wide transition-all shadow-sm"
+              >送出詢價</button>
+
+              <!-- 送出成功提示 -->
+              <div id="form-success" class="hidden flex items-center gap-2 px-4 py-3 rounded-lg border border-green-200 bg-green-50 text-xs text-green-700">
+                <i class="ph ph-check-circle text-base"></i>
+                <span>訊息已成功送出！我們會儘時處理您的詢問。</span>
+              </div>
+            </form>
+            <!-- ▌標示：防垃圾表單 -->
+            <div id="ann-conv-form" class="annotation-wrapper absolute bottom-full mb-6 left-4 w-64 z-50">
+              <div class="absolute -inset-4 rounded-2xl annotation-dash pointer-events-none border-2"></div>
+              <div class="annotation-content ann-box relative p-4 rounded-xl shadow-2xl float-anim">
+                <div class="flex items-center gap-2 mb-2 pb-2 border-b border-white/20">
+                  <div class="w-2 h-2 rounded-full bg-white animate-pulse flex-shrink-0"></div>
+                  <h4 class="font-bold text-sm text-white">自訂防垃圾廣告詢價表單</h4>
+                </div>
+                <p class="text-xs text-white/85 leading-relaxed">客製化欄位，自動轉發至指定信箱，並內建 reCAPTCHA 隱形防機器人機制。</p>
+              </div>
+            </div>
+          </div>
+
+          <!-- 地圖 -->
+          <div id="map-card" class="relative bg-gray-100 rounded-2xl overflow-visible flex flex-col border border-gray-200 min-h-[320px] feature-dash-border is-dimmed">
+            <iframe
+              title="丹淳有限公司地圖"
+              class="w-full h-full min-h-[320px] rounded-2xl"
+              src="https://maps.google.com/maps?q=%E8%87%BA%E4%B8%AD%E5%B8%82%E5%A4%A7%E9%87%8C%E5%8D%80%E9%95%B7%E6%A6%AE%E9%87%8C%E5%A4%A7%E9%87%8C%E8%B7%AF31%E4%B9%8B2%E4%B9%8B4%E8%99%9F&z=17&output=embed"
+              loading="lazy"
+              referrerpolicy="no-referrer-when-downgrade"
+              allowfullscreen>
+            </iframe>
+            <div class="absolute left-4 bottom-4 bg-white/92 backdrop-blur px-3 py-2 rounded-lg shadow text-xs text-gray-600 border border-gray-200 z-10">
+              公司登記址｜臺中市大里區長榮里大里路31之2之4號
+            </div>
+            <!-- ▌標示：社群地圖 -->
+            <div id="ann-conv-map" class="annotation-wrapper absolute bottom-4 right-4 w-72 z-[160]">
+              <div class="absolute inset-0 rounded-2xl annotation-dash pointer-events-none border-2"></div>
+              <div class="annotation-content ann-box relative p-4 rounded-xl shadow-2xl float-anim" style="animation-delay:-1s">
+                <div class="flex items-center gap-2 mb-2 pb-2 border-b border-white/20">
+                  <div class="w-2 h-2 rounded-full bg-white animate-pulse flex-shrink-0"></div>
+                  <h4 class="font-bold text-sm text-white">社群矩陣與地圖深度整合</h4>
+                </div>
+                <p class="text-xs text-white/85 leading-relaxed mb-3">社群圖示無縫串接，並嵌入 Google Maps 動態地圖，方便客戶導航與在地搜尋。</p>
+                <div class="flex flex-wrap gap-2">
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/12 text-white text-[11px] border border-white/15"><i class="ph ph-facebook-logo text-sm"></i> FB</span>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/12 text-white text-[11px] border border-white/15"><i class="ph ph-instagram-logo text-sm"></i> IG</span>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/12 text-white text-[11px] border border-white/15"><i class="ph ph-chat-centered-dots text-sm"></i> LINE</span>
+                  <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/12 text-white text-[11px] border border-white/15"><i class="ph ph-map-pin-line text-sm"></i> MAP</span>
+                </div>
+              </div>
+            </div>
+          </div>
+
+        </div>
+
+        <!-- ── 真實轉換 CTA 區 ── -->
+        <section class="max-w-5xl mx-auto mt-16 px-8">
+          <div class="cta-panel rounded-3xl bg-cover bg-center bg-no-repeat p-8 md:p-12 text-nature-800 shadow-xl border border-nature-200 relative overflow-hidden" style="background-image: url('cta模擬.png');">
+            <div class="absolute -top-20 -right-16 w-64 h-64 rounded-full bg-nature-200/50 blur-3xl pointer-events-none"></div>
+            <div class="absolute -bottom-24 -left-14 w-72 h-72 rounded-full bg-morandi-200/35 blur-3xl pointer-events-none"></div>
+
+            <div class="cta-grid relative z-10 grid md:grid-cols-[1.18fr_.82fr] gap-8 items-start">
+              <div>
+                <p class="text-xs md:text-sm tracking-[0.2em] uppercase text-nature-600 mb-3">Danchun Digital Experience</p>
+                <h3 class="text-3xl md:text-4xl font-serif font-bold leading-tight text-nature-800 mb-4">
+                  讓網站成為最穩定的業務來源
+                </h3>
+                <p class="text-gray-700 leading-relaxed mb-6 md:text-[17px]">
+                  從品牌定位、UI/UX 設計到開發上線，丹淳提供一站式網站建置流程，幫助企業提升專業形象並放大詢問轉換率。
+                </p>
+
+                <div class="flex flex-wrap gap-3 mb-7 text-sm text-nature-700">
+                  <span class="px-3 py-1.5 rounded-full bg-white/75 border border-nature-200">品牌識別一致化</span>
+                  <span class="px-3 py-1.5 rounded-full bg-white/75 border border-nature-200">清楚導流與轉換動線</span>
+                  <span class="px-3 py-1.5 rounded-full bg-white/75 border border-nature-200">可追蹤數據成效</span>
+                </div>
+
+                <div class="cta-actions flex flex-wrap items-center gap-3">
+                  <button class="px-6 py-3 rounded-full bg-nature-600 hover:bg-nature-700 text-white font-bold tracking-wide transition-all shadow-md">
+                    預約 30 分鐘專案諮詢
+                  </button>
+                  <button class="px-6 py-3 rounded-full border border-nature-300 hover:bg-white text-nature-700 font-medium tracking-wide transition-all">
+                    查看網站設計案例
+                  </button>
+                </div>
+              </div>
+
+              <div class="cta-stats bg-white/88 border border-nature-200 rounded-2xl p-6 shadow-sm backdrop-blur-sm">
+                <p class="text-sm text-nature-600 mb-4">預估上線成效</p>
+                <div class="space-y-4">
+                  <div class="flex items-end justify-between border-b border-nature-200 pb-3">
+                    <span class="text-gray-600">平均停留時間</span>
+                    <span class="text-2xl font-bold text-nature-800">+40%</span>
+                  </div>
+                  <div class="flex items-end justify-between border-b border-nature-200 pb-3">
+                    <span class="text-gray-600">詢問轉換率</span>
+                    <span class="text-2xl font-bold text-nature-800">2.0x</span>
+                  </div>
+                  <div class="flex items-end justify-between">
+                    <span class="text-gray-600">首頁載入速度</span>
+                    <span class="text-2xl font-bold text-nature-800">&lt; 1.3s</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <!-- ── 真實 Footer 區 ── -->
+        <footer class="mt-16 border-t border-gray-200 bg-white/90 backdrop-blur px-8 py-12">
+          <div class="footer-grid max-w-5xl mx-auto grid md:grid-cols-4 gap-10 text-sm">
+            <div class="md:col-span-2">
+              <div class="flex items-center gap-3 text-nature-600 mb-4">
+                <i class="ph ph-flower-lotus text-3xl"></i>
+                <div class="font-serif font-bold text-2xl leading-none tracking-widest text-nature-800">丹淳 DANCHUN</div>
+              </div>
+              <p class="text-gray-600 leading-relaxed mb-4 max-w-md">
+                丹淳是提供網站設計與數位整合的專業團隊，從品牌定位、UI/UX 設計到技術上線，協助企業打造可持續成長的官網。
+              </p>
+              <div class="flex flex-wrap gap-2 text-xs text-gray-500">
+                <span class="px-2.5 py-1 rounded-full bg-gray-100 border border-gray-200">全台遠端服務</span>
+                <span class="px-2.5 py-1 rounded-full bg-gray-100 border border-gray-200">企業網站顧問</span>
+              </div>
+            </div>
+
+            <div>
+              <h4 class="font-bold text-nature-800 mb-3">服務項目</h4>
+              <ul class="space-y-2 text-gray-600">
+                <li>品牌官網規劃</li>
+                <li>UI/UX 視覺設計</li>
+                <li>內容策略企劃</li>
+                <li>SEO 與速度優化</li>
+              </ul>
+            </div>
+
+            <div>
+              <h4 class="font-bold text-nature-800 mb-3">聯絡我們</h4>
+              <ul class="space-y-2 text-gray-600">
+                <li>0973591518</li>
+                <li>change280@gmail.com</li>
+                <li>臺中市大里區長榮里大里路31之2之4號</li>
+                <li class="pt-1 flex items-center gap-2 text-nature-600">
+                  <i class="ph ph-clock"></i> Mon - Fri 09:00 - 18:00
+                </li>
+              </ul>
+            </div>
+          </div>
+
+          <div class="footer-meta max-w-5xl mx-auto mt-8 pt-5 border-t border-gray-200 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-500">
+            <p>© 2026 丹淳 Danchun. All rights reserved.</p>
+            <div class="flex items-center gap-4">
+              <span>隱私權政策</span>
+              <span>服務條款</span>
+              <span>網站地圖</span>
+            </div>
+          </div>
+        </footer>
+
+      </div><!-- / mockup-content -->
+    </div><!-- / browser -->
+
+
+
+  </div><!-- / main -->
+
+
+  <!-- ═══════════════════════════════════════
+       互動邏輯
+       ═══════════════════════════════════════ -->
+  <script>
+    document.addEventListener('DOMContentLoaded', () => {
+      const toggleBtn      = document.getElementById('toggleAnnotations');
+
+      /* ── 聯絡表單 reCAPTCHA v2 驗證 ── */
+      const contactForm   = document.getElementById('contact-form');
+      const formError     = document.getElementById('form-error');
+      const formSuccess   = document.getElementById('form-success');
+      if (contactForm) {
+        contactForm.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const token = typeof grecaptcha !== 'undefined' ? grecaptcha.getResponse() : '';
+          if (!token) {
+            formError.classList.remove('hidden');
+            return;
+          }
+          formError.classList.add('hidden');
+          // 示意送出成功（實際部署時改串後端驗證 API）
+          contactForm.querySelector('#form-submit').disabled = true;
+          contactForm.querySelector('#form-submit').textContent = '傳送中…';
+          setTimeout(() => {
+            contactForm.reset();
+            grecaptcha.reset();
+            contactForm.querySelector('#form-submit').classList.add('hidden');
+            formSuccess.classList.remove('hidden');
+          }, 800);
+        });
+      }
+      const allAnnotations = document.querySelectorAll('.annotation-wrapper');
+      const subItems       = document.querySelectorAll('.sub-item');
+      const previewBrowser = document.getElementById('preview-browser');
+      const servicePanel   = document.getElementById('service-panel');
+      const serviceCategories = servicePanel ? servicePanel.querySelectorAll('.service-category') : [];
+      const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
+      const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+      const mockHeader = document.getElementById('mock-header');
+      const stickyCtaContainer = document.getElementById('sticky-cta-container');
+      let isAllShowing     = false;
+      let isMobilePreviewLocked = false;
+      let stickyCtaRafId = null;
+      let serviceCloseTimer = null;
+
+      function clearServiceCloseTimer() {
+        if (!serviceCloseTimer) return;
+        clearTimeout(serviceCloseTimer);
+        serviceCloseTimer = null;
+      }
+
+      function closeAllServiceCategories() {
+        serviceCategories.forEach(category => category.classList.remove('is-open'));
+        if (servicePanel) {
+          servicePanel.classList.remove('has-open-category');
+        }
+      }
+
+      function openServiceCategory(categoryToOpen) {
+        if (servicePanel) {
+          servicePanel.classList.add('has-open-category');
+        }
+        serviceCategories.forEach(category => {
+          category.classList.toggle('is-open', category === categoryToOpen);
+        });
+      }
+
+      if (servicePanel && serviceCategories.length) {
+        servicePanel.addEventListener('mouseenter', () => {
+          clearServiceCloseTimer();
+        });
+
+        servicePanel.addEventListener('mouseleave', () => {
+          clearServiceCloseTimer();
+          serviceCloseTimer = setTimeout(() => {
+            closeAllServiceCategories();
+          }, 180);
+        });
+
+        serviceCategories.forEach(category => {
+          category.addEventListener('mouseenter', () => {
+            clearServiceCloseTimer();
+            openServiceCategory(category);
+          });
+
+          category.addEventListener('focusin', () => {
+            clearServiceCloseTimer();
+            openServiceCategory(category);
+          });
+        });
+      }
+
+      function setMobileMenuOpen(isOpen) {
+        if (!mobileMenuPanel || !mobileMenuToggle) return;
+        mobileMenuPanel.classList.toggle('hidden', !isOpen);
+        mobileMenuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
+        mobileMenuToggle.classList.toggle('is-open', isOpen);
+
+        const iconEl = mobileMenuToggle.querySelector('i');
+        if (iconEl) {
+          iconEl.className = isOpen ? 'ph ph-x text-2xl' : 'ph ph-list text-2xl';
+        }
+      }
+
+      if (mobileMenuToggle && mobileMenuPanel) {
+        mobileMenuToggle.addEventListener('click', (event) => {
+          event.stopPropagation();
+          const shouldOpen = mobileMenuPanel.classList.contains('hidden');
+          setMobileMenuOpen(shouldOpen);
+        });
+
+        document.addEventListener('click', (event) => {
+          if (!mockHeader || !mobileMenuPanel || mobileMenuPanel.classList.contains('hidden')) return;
+          if (!mockHeader.contains(event.target)) {
+            setMobileMenuOpen(false);
+          }
+        });
+      }
+
+      const annotationAnchorMap = {
+        // 注意：ann-uiux-rwd 已從此映射中移除，保持其浮動徽章的原始位置
+        // 'ann-uiux-rwd': 'hero-banner',
+        'ann-uiux-nav': 'mock-header',
+        'ann-uiux-ci': 'hero-banner',
+        'ann-uiux-hover': 'hero-cta-btn',
+        'ann-conv-lang': 'lang-switch-btn',
+        'ann-conv-form': 'form-card',
+        'ann-conv-map': 'map-card',
+        'ann-conv-cta': 'floating-cta-wrap'
+      };
+      const featureToAnnotationMap = Object.fromEntries(
+        Object.entries(annotationAnchorMap).map(([annotationId, featureId]) => [featureId, annotationId])
+      );
+
+      // 不需要動態定位的注解框（保持原始樣式）
+      const excludeFromMobileReposition = ['ann-uiux-rwd'];
+
+      function clearMobileAnnotationInlineStyles() {
+        allAnnotations.forEach(ann => {
+          ann.style.left = '';
+          ann.style.right = '';
+          ann.style.top = '';
+          ann.style.bottom = '';
+          ann.style.transform = '';
+          ann.style.width = '';
+        });
+      }
+
+      function positionStickyCta() {
+        if (!previewBrowser || !stickyCtaContainer) return;
+
+        const previewRect = previewBrowser.getBoundingClientRect();
+        const ctaRect = stickyCtaContainer.getBoundingClientRect();
+        const ctaWidth = Math.max(64, ctaRect.width || 64);
+        const ctaHeight = Math.max(64, ctaRect.height || 64);
+        const isSmallScreen = window.innerWidth <= 768;
+        const sideInset = isSmallScreen ? 10 : 18;
+        const bottomInset = isSmallScreen ? 18 : 26;
+
+        let left = previewRect.right - ctaWidth - sideInset;
+        const minLeft = previewRect.left + 8;
+        const maxLeft = previewRect.right - ctaWidth - 8;
+        left = Math.max(minLeft, Math.min(maxLeft, left));
+
+        let top = window.innerHeight - ctaHeight - bottomInset;
+        const minTop = Math.max(72, previewRect.top + 8);
+        const maxTop = Math.min(window.innerHeight - ctaHeight - 8, previewRect.bottom - ctaHeight - 8);
+        top = Math.max(minTop, Math.min(maxTop, top));
+
+        stickyCtaContainer.style.left = `${Math.round(left)}px`;
+        stickyCtaContainer.style.top = `${Math.round(top)}px`;
+      }
+
+      function positionAnnotationForMobile(annotationId) {
+        if (!document.body.classList.contains('mobile-preview-mode') || !previewBrowser) return;
+
+        const annEl = document.getElementById(annotationId);
+        if (!annEl) return;
+
+        // 排除不需要動態定位的注解框
+        if (excludeFromMobileReposition.includes(annotationId)) {
+          return;
+        }
+
+        const anchorId = annotationAnchorMap[annotationId];
+        const anchorEl = anchorId ? document.getElementById(anchorId) : null;
+        
+        // 如果錨點不存在或不可見，使用備用策略
+        if (!anchorEl || !isElementVisible(anchorEl)) {
+          positionAnnotationFallback(annotationId, annEl);
+          return;
+        }
+
+        const previewRect = previewBrowser.getBoundingClientRect();
+        const anchorRect = anchorEl.getBoundingClientRect();
+        const annRect = annEl.getBoundingClientRect();
+
+        const annWidth = Math.max(220, annRect.width || 240);
+        const annHeight = Math.max(96, annRect.height || 140);
+        const gap = 18;
+        const viewportPadding = 10;
+
+        // 判斷應放在左側還是右側
+        const previewCenterX = previewRect.left + (previewRect.width / 2);
+        const anchorCenterX = anchorRect.left + (anchorRect.width / 2);
+        const placeLeft = anchorCenterX <= previewCenterX;
+        
+        let targetLeft = placeLeft
+          ? (previewRect.left - annWidth - gap)
+          : (previewRect.right + gap);
+
+        const minLeft = viewportPadding;
+        const maxLeft = window.innerWidth - annWidth - viewportPadding;
+        targetLeft = Math.max(minLeft, Math.min(maxLeft, targetLeft));
+
+        let targetTop = anchorRect.top + (anchorRect.height / 2) - (annHeight / 2);
+        const minTop = 70;
+        const maxTop = window.innerHeight - annHeight - 12;
+        targetTop = Math.max(minTop, Math.min(maxTop, targetTop));
+
+        // 避開右側服務面板
+        if (!placeLeft && servicePanel) {
+          const panelRect = servicePanel.getBoundingClientRect();
+          const overlapsPanelHoriz = (targetLeft + annWidth) > (panelRect.left - 8);
+          const overlapsPanelVert = (targetTop < panelRect.bottom) && ((targetTop + annHeight) > panelRect.top);
+
+          if (overlapsPanelHoriz && overlapsPanelVert) {
+            targetLeft = previewRect.left - annWidth - gap;
+            targetLeft = Math.max(minLeft, Math.min(maxLeft, targetLeft));
+          }
+        }
+
+        applyAnnotationPosition(annEl, targetLeft, targetTop);
+      }
+
+      // 檢查元素是否可見
+      function isElementVisible(el) {
+        if (!el) return false;
+        const rect = el.getBoundingClientRect();
+        const windowHeight = window.innerHeight || document.documentElement.clientHeight;
+        const windowWidth = window.innerWidth || document.documentElement.clientWidth;
+        
+        // 檢查元素是否在視口內
+        const isInViewport = (
+          rect.top < windowHeight &&
+          rect.bottom > 0 &&
+          rect.left < windowWidth &&
+          rect.right > 0
+        );
+        
+        // 檢查元素的顯示屬性
+        const isDisplayed = window.getComputedStyle(el).display !== 'none';
+        
+        return isInViewport && isDisplayed;
+      }
+
+      // 備用定位策略（錨點不可見時）
+      function positionAnnotationFallback(annotationId, annEl) {
+        const annRect = annEl.getBoundingClientRect();
+        const annWidth = Math.max(220, annRect.width || 240);
+        const annHeight = Math.max(96, annRect.height || 140);
+        const viewportPadding = 10;
+        const previewRect = previewBrowser.getBoundingClientRect();
+
+        let targetLeft, targetTop;
+
+        // 根據注解框 ID 使用特定的備用策略
+        if (annotationId === 'ann-conv-lang') {
+          // 多語系：放在預覽視窗右上角附近
+          targetLeft = previewRect.right + 18;
+          targetTop = previewRect.top + 100;
+        } else if (annotationId === 'ann-uiux-nav') {
+          // 導覽：放在預覽視窗上方中心
+          targetLeft = previewRect.left + (previewRect.width / 2) - (annWidth / 2);
+          targetTop = previewRect.top - annHeight - 20;
+        } else {
+          // 預設：放在左側
+          targetLeft = previewRect.left - annWidth - 18;
+          targetTop = previewRect.top + 100;
+        }
+
+        const minLeft = viewportPadding;
+        const maxLeft = window.innerWidth - annWidth - viewportPadding;
+        targetLeft = Math.max(minLeft, Math.min(maxLeft, targetLeft));
+
+        const minTop = 70;
+        const maxTop = window.innerHeight - annHeight - 12;
+        targetTop = Math.max(minTop, Math.min(maxTop, targetTop));
+
+        applyAnnotationPosition(annEl, targetLeft, targetTop);
+      }
+
+      // 應用位置樣式
+      function applyAnnotationPosition(annEl, left, top) {
+        annEl.style.left = `${Math.round(left)}px`;
+        annEl.style.top = `${Math.round(top)}px`;
+        annEl.style.right = 'auto';
+        annEl.style.bottom = 'auto';
+        annEl.style.transform = 'none';
+      }
+
+      function setMobilePreviewMode(enabled) {
+        if (previewBrowser) {
+          previewBrowser.classList.toggle('mobile-sim', enabled);
+        }
+        document.body.classList.toggle('mobile-preview-mode', enabled);
+
+        requestAnimationFrame(() => {
+          positionStickyCta();
+        });
+
+        if (!enabled) {
+          clearMobileAnnotationInlineStyles();
+        } else {
+          requestAnimationFrame(() => {
+            document.querySelectorAll('.annotation-wrapper.annotation-active').forEach(ann => {
+              positionAnnotationForMobile(ann.id);
+            });
+          });
+        }
+      }
+
+      positionStickyCta();
+
+      function settleMobileAnnotationPosition(annotationId) {
+        if (!document.body.classList.contains('mobile-preview-mode')) return;
+        [0, 220, 520].forEach(delay => {
+          setTimeout(() => {
+            positionAnnotationForMobile(annotationId);
+          }, delay);
+        });
+      }
+
+      function activateAnnotationByFeature(featureId) {
+        const annotationId = featureToAnnotationMap[featureId];
+        if (!annotationId || isAllShowing) return;
+
+        const annEl = document.getElementById(annotationId);
+        const featureEl = document.getElementById(featureId);
+        if (!annEl || !featureEl) return;
+
+        annEl.classList.remove('annotation-dimmed');
+        annEl.classList.add('annotation-active');
+        featureEl.classList.remove('is-dimmed');
+        featureEl.classList.add('is-active');
+
+        if (document.body.classList.contains('mobile-preview-mode')) {
+          requestAnimationFrame(() => {
+            settleMobileAnnotationPosition(annotationId);
+          });
+        }
+      }
+
+      function deactivateAnnotationByFeature(featureId) {
+        const annotationId = featureToAnnotationMap[featureId];
+        if (!annotationId || isAllShowing) return;
+
+        const annEl = document.getElementById(annotationId);
+        const featureEl = document.getElementById(featureId);
+        if (!annEl || !featureEl) return;
+
+        annEl.classList.remove('annotation-active');
+        annEl.classList.add('annotation-dimmed');
+        featureEl.classList.remove('is-active');
+        featureEl.classList.add('is-dimmed');
+      }
+
+      Object.keys(featureToAnnotationMap).forEach(featureId => {
+        const featureEl = document.getElementById(featureId);
+        if (!featureEl) return;
+
+        featureEl.addEventListener('mouseenter', () => {
+          activateAnnotationByFeature(featureId);
+        });
+
+        featureEl.addEventListener('mouseleave', () => {
+          deactivateAnnotationByFeature(featureId);
+        });
+      });
+
+      /* ── 初始化：全部設為 dimmed ── */
+      function resetToDimmed() {
+        allAnnotations.forEach(ann => {
+          ann.classList.remove('annotation-active');
+          ann.classList.add('annotation-dimmed');
+          
+          // 同步功能元素的虛線框
+          const featureId = annotationAnchorMap[ann.id];
+          if (featureId) {
+            const featureEl = document.getElementById(featureId);
+            if (featureEl) {
+              featureEl.classList.remove('is-active');
+              featureEl.classList.add('is-dimmed');
+            }
+          }
+        });
+      }
+      resetToDimmed();
+
+      /* ── 全局切換：強制顯示 / 恢復互動模式 ── */
+      toggleBtn.addEventListener('click', () => {
+        isAllShowing = !isAllShowing;
+
+        if (isAllShowing) {
+          allAnnotations.forEach(ann => {
+            ann.classList.remove('annotation-dimmed');
+            ann.classList.add('annotation-active');
+            
+            // 同步功能元素的虛線框
+            const featureId = annotationAnchorMap[ann.id];
+            if (featureId) {
+              const featureEl = document.getElementById(featureId);
+              if (featureEl) {
+                featureEl.classList.remove('is-dimmed');
+                featureEl.classList.add('is-active');
+              }
+            }
+          });
+          if (document.body.classList.contains('mobile-preview-mode')) {
+            requestAnimationFrame(() => {
+              allAnnotations.forEach(ann => positionAnnotationForMobile(ann.id));
+            });
+          }
+          toggleBtn.innerHTML = `<i class="ph ph-eye-slash text-lg"></i><span>恢復互動探索模式</span>`;
+          toggleBtn.className = 'flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all btn-show-all';
+        } else {
+          resetToDimmed();
+          if (document.body.classList.contains('mobile-preview-mode')) {
+            clearMobileAnnotationInlineStyles();
+          }
+          document.querySelectorAll('[id^="card-"]').forEach(c => c.classList.remove('card-active'));
+          toggleBtn.innerHTML = `<i class="ph ph-eye text-lg"></i><span>強制顯示所有標示</span>`;
+          toggleBtn.className = 'flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all bg-nature-50 border border-nature-200 text-nature-700 hover:bg-nature-100';
+        }
+      });
+
+      /* ── 子項目 hover：捲動 + 啟動對應標示或高亮卡片 ── */
+      subItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const targetId = item.dataset.target;
+          if (targetId !== 'ann-uiux-rwd' || !previewBrowser) return;
+
+          // 點擊切換：桌機 <-> 手機預覽（持續狀態）
+          isMobilePreviewLocked = !isMobilePreviewLocked;
+          setMobilePreviewMode(isMobilePreviewLocked);
+        });
+
+        item.addEventListener('mouseenter', () => {
+          const targetId = item.dataset.target;
+          const targetEl = document.getElementById(targetId);
+          if (!targetEl) return;
+
+          // 平滑捲動至目標；依不同區塊使用更精準的落點
+          if (targetId === 'ann-conv-cta') {
+            // Sticky CTA 固定於視窗，不需要捲動到其 DOM 位置
+          } else if (targetId === 'ann-conv-map') {
+            const mapCard = document.getElementById('map-card');
+            const anchorEl = mapCard || targetEl;
+            const topOffset = 120;
+            const targetTop = anchorEl.getBoundingClientRect().top + window.scrollY - topOffset;
+            window.scrollTo({ top: targetTop, behavior: 'smooth' });
+          } else if (targetId === 'ann-conv-form') {
+            const topOffset = 160;
+            const targetTop = targetEl.getBoundingClientRect().top + window.scrollY - topOffset;
+            window.scrollTo({ top: targetTop, behavior: 'smooth' });
+          } else {
+            targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          }
+
+          // 特殊：如果 hover 「智慧型置頂選單」，一個一個接續展開再收回
+          if (targetId === 'ann-uiux-nav') {
+            const navItems = document.querySelectorAll('.nav-item.has-dropdown');
+            const cycleDuration = 800; // 每個菜單的完整周期：展開+保持+收回
+            
+            navItems.forEach((nav, index) => {
+              const delay = index * cycleDuration;
+              // 展開
+              setTimeout(() => {
+                nav.classList.add('expanded-menu');
+              }, delay);
+              // 收回
+              setTimeout(() => {
+                nav.classList.remove('expanded-menu');
+              }, delay + 500);
+            });
+          }
+
+          // 特殊：如果 hover 「RWD 跨裝置完美適配」，切換成手機寬度預覽
+          if (targetId === 'ann-uiux-rwd' && previewBrowser) {
+            setMobilePreviewMode(true);
+          }
+
+          if (targetEl.classList.contains('annotation-wrapper')) {
+            // 標示匡：dimmed → active
+            if (!isAllShowing) {
+              targetEl.classList.remove('annotation-dimmed');
+              targetEl.classList.add('annotation-active');
+              
+              // 同步功能元素的虛線框
+              const featureId = annotationAnchorMap[targetId];
+              if (featureId) {
+                const featureEl = document.getElementById(featureId);
+                if (featureEl) {
+                  featureEl.classList.remove('is-dimmed');
+                  featureEl.classList.add('is-active');
+                }
+              }
+              
+              if (document.body.classList.contains('mobile-preview-mode')) {
+                requestAnimationFrame(() => {
+                  settleMobileAnnotationPosition(targetId);
+                });
+              }
+            }
+          } else {
+            // 技術卡片：高亮
+            targetEl.classList.add('card-active');
+          }
+        });
+
+        item.addEventListener('mouseleave', () => {
+          const targetId = item.dataset.target;
+          const targetEl = document.getElementById(targetId);
+          if (!targetEl) return;
+
+          // 取消展開導航
+          if (targetId === 'ann-uiux-nav') {
+            const navItems = document.querySelectorAll('.nav-item.has-dropdown');
+            navItems.forEach(nav => {
+              nav.classList.remove('expanded-menu');
+            });
+          }
+
+          if (targetId === 'ann-uiux-rwd' && previewBrowser && !isMobilePreviewLocked) {
+            setMobilePreviewMode(false);
+          }
+
+          if (targetEl.classList.contains('annotation-wrapper')) {
+            if (!isAllShowing) {
+              targetEl.classList.remove('annotation-active');
+              targetEl.classList.add('annotation-dimmed');
+              
+              // 同步功能元素的虛線框
+              const featureId = annotationAnchorMap[targetId];
+              if (featureId) {
+                const featureEl = document.getElementById(featureId);
+                if (featureEl) {
+                  featureEl.classList.remove('is-active');
+                  featureEl.classList.add('is-dimmed');
+                }
+              }
+            }
+          } else {
+            targetEl.classList.remove('card-active');
+          }
+        });
+      });
+
+      window.addEventListener('resize', () => {
+        if (window.innerWidth >= 1024) {
+          setMobileMenuOpen(false);
+        }
+        positionStickyCta();
+        if (!document.body.classList.contains('mobile-preview-mode')) return;
+        document.querySelectorAll('.annotation-wrapper.annotation-active').forEach(ann => {
+          positionAnnotationForMobile(ann.id);
+        });
+      });
+
+      // Hero parallax
+      const heroBanner = document.getElementById('hero-banner');
+      function updateHeroParallax() {
+        if (!heroBanner) return;
+        const scrolled = window.scrollY;
+        const heroBottom = heroBanner.getBoundingClientRect().bottom + scrolled;
+        if (scrolled > heroBottom) return; // hero 已離開視埠
+        const rate = 0.35;
+        heroBanner.style.backgroundPositionY = `calc(50% + ${Math.round(scrolled * rate)}px)`;
+      }
+
+      let repositionRafId = null;
+      window.addEventListener('scroll', () => {
+        if (!stickyCtaRafId) {
+          stickyCtaRafId = requestAnimationFrame(() => {
+            stickyCtaRafId = null;
+            positionStickyCta();
+            updateHeroParallax();
+          });
+        }
+
+        if (!document.body.classList.contains('mobile-preview-mode')) return;
+        if (repositionRafId) return;
+
+        repositionRafId = requestAnimationFrame(() => {
+          repositionRafId = null;
+          document.querySelectorAll('.annotation-wrapper.annotation-active').forEach(ann => {
+            positionAnnotationForMobile(ann.id);
+          });
+        });
+      }, { passive: true });
+    });
+  </script>
+
+</body>
+</html>
