@@ -9,8 +9,8 @@
   <script src="https://cdn.tailwindcss.com"></script>
   <!-- Phosphor Icons -->
   <script src="https://unpkg.com/@phosphor-icons/web@2.1.1"></script>
-  <!-- Google reCAPTCHA v2 -->
-  <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+  <!-- Google reCAPTCHA v3 -->
+  <script src="https://www.google.com/recaptcha/api.js?render=6LfPLu0sAAAAAPNfQUbxWBxNuJmbra-MqAL-oz3K" async defer></script>
 
   <script>
     tailwind.config = {
@@ -1106,7 +1106,7 @@
             <h3 class="text-xl font-bold mb-6 text-nature-800 flex items-center gap-2">
               <i class="ph-fill ph-envelope-open text-nature-500"></i> 聯絡我們
             </h3>
-            <form id="contact-form" class="space-y-4" data-api-endpoint="https://danchun-contact-api.change280.workers.dev" novalidate>
+            <form id="contact-form" class="space-y-4" data-api-endpoint="https://danchun-contact-api.change280.workers.dev/api/contact" data-recaptcha-sitekey="6LfPLu0sAAAAAPNfQUbxWBxNuJmbra-MqAL-oz3K" data-recaptcha-action="contact_submit" novalidate>
               <input
                 type="text" name="name" id="form-name" required
                 placeholder="請輸入您的姓名"
@@ -1123,9 +1123,10 @@
                 class="w-full bg-gray-50 border border-gray-200 rounded-lg px-4 py-3 text-sm text-gray-700 placeholder-gray-400 outline-none focus:border-nature-400 focus:ring-2 focus:ring-nature-100 transition resize-none"
               ></textarea>
 
-              <!-- reCAPTCHA v2 checkbox widget -->
-              <div class="flex justify-start">
-                <div class="g-recaptcha" data-sitekey="6LfPLu0sAAAAAPNfQUbxWBxNuJmbra-MqAL-oz3K"></div>
+              <!-- reCAPTCHA v3：送出時會自動取得 token，不顯示核取方塊 -->
+              <div class="flex items-center gap-2 px-4 py-3 rounded-lg border border-gray-200 bg-gray-50 text-xs text-gray-500">
+                <i class="ph ph-shield-check text-base text-nature-500"></i>
+                <span>已啟用 reCAPTCHA v3 隱形驗證，送出時自動完成風險判定</span>
               </div>
 
               <!-- 驗證/送出提示 -->
@@ -1308,14 +1309,17 @@
     document.addEventListener('DOMContentLoaded', () => {
       const toggleBtn      = document.getElementById('toggleAnnotations');
 
-      /* ── 聯絡表單 reCAPTCHA v2 + API 正式送出 ── */
+      /* ── 聯絡表單 reCAPTCHA v3 + API 正式送出 ── */
       const contactForm   = document.getElementById('contact-form');
       const formError     = document.getElementById('form-error');
       const formSuccess   = document.getElementById('form-success');
       const submitButton  = document.getElementById('form-submit');
       const DEFAULT_API_ENDPOINT = '';
+      const DEFAULT_RECAPTCHA_SITE_KEY = '';
       const CONTACT_API_VERSION = '2026-05-16';
       const CONTACT_REQUEST_CONTENT_TYPE = 'application/json';
+      const CONTACT_RECAPTCHA_ACTION = 'contact_submit';
+      const CONTACT_RECAPTCHA_SCORE_THRESHOLD = 0.5;
 
       // 固定對接契約
       // Request(JSON): {
@@ -1324,6 +1328,7 @@
       //   email: string,
       //   message: string,
       //   recaptchaToken: string,
+      //   recaptchaAction: string,
       //   source: string,
       //   submittedAt: string(ISO8601)
       // }
@@ -1331,8 +1336,30 @@
       //   ok: boolean,
       //   message: string,
       //   requestId?: string,
-      //   fieldErrors?: { name?: string, email?: string, message?: string }
+      //   fieldErrors?: { name?: string, email?: string, message?: string, recaptchaToken?: string }
       // }
+      // Worker 驗證規則：
+      // 1. 只接受 POST /api/contact
+      // 2. 驗證 Google reCAPTCHA v3 token
+      // 3. success 必須為 true
+      // 4. action 必須等於 contact_submit
+      // 5. score 必須 >= 0.5
+      // 6. hostname 應為 change280.github.io（或你的正式網域）
+      // }
+
+      async function getRecaptchaToken(siteKey, action) {
+        if (typeof grecaptcha === 'undefined') {
+          throw new Error('reCAPTCHA 尚未載入完成，請稍後再試。');
+        }
+
+        return new Promise((resolve, reject) => {
+          grecaptcha.ready(() => {
+            grecaptcha.execute(siteKey, { action })
+              .then(resolve)
+              .catch(() => reject(new Error('無法取得 reCAPTCHA token，請重新整理後再試。')));
+          });
+        });
+      }
 
       async function parseContactApiResponse(response) {
         const contentType = response.headers.get('content-type') || '';
@@ -1372,8 +1399,16 @@
           e.preventDefault();
 
           const configuredEndpoint = (contactForm.dataset.apiEndpoint || DEFAULT_API_ENDPOINT || '').trim();
+          const recaptchaSiteKey = (contactForm.dataset.recaptchaSitekey || DEFAULT_RECAPTCHA_SITE_KEY || '').trim();
+          const recaptchaAction = (contactForm.dataset.recaptchaAction || CONTACT_RECAPTCHA_ACTION || '').trim();
+
           if (!configuredEndpoint) {
             setFormError('尚未設定 API endpoint，請先在 form 的 data-api-endpoint 填入後端網址。');
+            return;
+          }
+
+          if (!recaptchaSiteKey || recaptchaSiteKey === 'YOUR_V3_SITE_KEY_HERE') {
+            setFormError('尚未設定 reCAPTCHA v3 Site Key，請先填入正確金鑰。');
             return;
           }
 
@@ -1383,9 +1418,11 @@
             return;
           }
 
-          const token = (typeof grecaptcha !== 'undefined') ? grecaptcha.getResponse() : '';
-          if (!token) {
-            setFormError('請先完成 reCAPTCHA 驗證。');
+          let token = '';
+          try {
+            token = await getRecaptchaToken(recaptchaSiteKey, recaptchaAction);
+          } catch (error) {
+            setFormError(error.message || '請先完成 reCAPTCHA 驗證。');
             return;
           }
 
@@ -1404,6 +1441,7 @@
             email: (document.getElementById('form-email')?.value || '').trim(),
             message: (document.getElementById('form-message')?.value || '').trim(),
             recaptchaToken: token,
+            recaptchaAction,
             source: window.location.href,
             submittedAt: new Date().toISOString()
           };
@@ -1420,9 +1458,6 @@
             const result = await parseContactApiResponse(response);
 
             contactForm.reset();
-            if (typeof grecaptcha !== 'undefined') {
-              grecaptcha.reset();
-            }
             if (formSuccess) {
               formSuccess.classList.remove('hidden');
             }
