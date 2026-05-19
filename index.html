@@ -46,7 +46,82 @@
     }
   </script>
 
+  <script>
+  // 手機版懸浮服務列表 X 關閉鍵功能
+  document.addEventListener('DOMContentLoaded', function () {
+    function isMobile() {
+      return window.innerWidth <= 1023 && !document.body.classList.contains('mobile-preview-mode');
+    }
+    function updateCloseBtnVisibility() {
+      document.querySelectorAll('.service-category').forEach(function (cat) {
+        var closeBtn = cat.querySelector('.close-category-btn');
+        if (!closeBtn) return;
+        if (isMobile() && cat.classList.contains('is-open')) {
+          closeBtn.classList.remove('hidden');
+        } else {
+          closeBtn.classList.add('hidden');
+        }
+      });
+    }
+    // 點擊 X 關閉展開的子選單
+    document.querySelectorAll('.close-category-btn').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var cat = btn.closest('.service-category');
+        var panel = document.getElementById('service-panel');
+        if (cat && cat.classList.contains('is-open')) {
+          cat.classList.remove('is-open');
+          // 若沒有任何 is-open，移除 has-open-category
+          setTimeout(function() {
+            var stillOpen = panel && panel.querySelector('.service-category.is-open');
+            if (!stillOpen && panel) panel.classList.remove('has-open-category');
+            updateCloseBtnVisibility();
+          }, 350); // 等動畫結束
+        } else {
+          updateCloseBtnVisibility();
+        }
+      });
+    });
 
+    // 手機版：點擊任何子項目自動收合服務選單
+    document.querySelectorAll('.service-category .sub-item').forEach(function (item) {
+      item.addEventListener('click', function (e) {
+        if (isMobile()) {
+          // 只關閉當前父 service-category，並同步 panel 狀態
+          var cat = item.closest('.service-category');
+          var panel = document.getElementById('service-panel');
+          if (cat) cat.classList.remove('is-open');
+          // 若沒有任何 is-open，移除 has-open-category
+          setTimeout(function() {
+            var stillOpen = panel && panel.querySelector('.service-category.is-open');
+            if (!stillOpen && panel) panel.classList.remove('has-open-category');
+            updateCloseBtnVisibility();
+          }, 350); // 等動畫結束
+          // 失焦目前點擊的元素，避免殘留 focus 樣式
+          if (document.activeElement) document.activeElement.blur();
+        }
+      });
+    });
+    // 監聽展開/收合時同步顯示 X
+    document.querySelectorAll('.service-category').forEach(function (cat) {
+        cat.addEventListener('transitionend', updateCloseBtnVisibility);
+        cat.addEventListener('mouseenter', function(e) {
+          updateCloseBtnVisibility();
+          // Prevent desktop hover/focus logic on mobile
+          if (isMobile()) return;
+          // Desktop hover logic (if any) can go here
+        });
+        cat.addEventListener('mouseleave', updateCloseBtnVisibility);
+        cat.addEventListener('focusin', function(e) {
+          // Prevent desktop focus logic on mobile
+          if (isMobile()) return;
+          // Desktop focus logic (if any) can go here
+        });
+    });
+    window.addEventListener('resize', updateCloseBtnVisibility);
+    updateCloseBtnVisibility();
+  });
+  </script>
 
   <style>
         /* 手機版：懸浮服務列表圓角向內、鏡像 */
@@ -383,7 +458,7 @@
       color: #6b7a6d;
     }
 
-    /* 導航項目展開指示符 */
+    /* 導覽項目展開指示符 */
     .nav-item.expanded-menu .dropdown-menu-1 {
       opacity: 1 !important;
       visibility: visible !important;
@@ -984,7 +1059,7 @@
         left: auto !important;
         right: 10px;
         top: auto !important;
-        bottom: 132px;
+        bottom: 12px;
       }
       body {
         background:
@@ -3077,7 +3152,7 @@
           }
 
           // 平滑捲動至目標；依不同區塊使用更精準的落點
-          if (targetId === 'ann-conv-cta') {
+          if (targetId === 'ann-uiux-rwd') {
             // Sticky CTA 固定於視窗，不需要捲動到其 DOM 位置
           } else if (targetId === 'ann-conv-map') {
             const mapCard = document.getElementById('map-card');
