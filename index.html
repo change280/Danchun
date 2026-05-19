@@ -46,52 +46,7 @@
     }
   </script>
 
-  <script>
-  // 手機版懸浮服務列表 X 關閉鍵功能
-  document.addEventListener('DOMContentLoaded', function () {
-    function isMobile() {
-      return window.innerWidth <= 1023 && !document.body.classList.contains('mobile-preview-mode');
-    }
-    function updateCloseBtnVisibility() {
-      document.querySelectorAll('.service-category').forEach(function (cat) {
-        var closeBtn = cat.querySelector('.close-category-btn');
-        if (!closeBtn) return;
-        if (isMobile() && cat.classList.contains('is-open')) {
-          closeBtn.classList.remove('hidden');
-        } else {
-          closeBtn.classList.add('hidden');
-        }
-      });
-    }
-    // 點擊 X 關閉展開的子選單
-    document.querySelectorAll('.close-category-btn').forEach(function (btn) {
-      btn.addEventListener('click', function (e) {
-        e.stopPropagation();
-        var cat = btn.closest('.service-category');
-        var panel = document.getElementById('service-panel');
-        if (cat && cat.classList.contains('is-open')) {
-          cat.classList.remove('is-open');
-          // 若沒有任何 is-open，移除 has-open-category
-          setTimeout(function() {
-            var stillOpen = panel && panel.querySelector('.service-category.is-open');
-            if (!stillOpen && panel) panel.classList.remove('has-open-category');
-            updateCloseBtnVisibility();
-          }, 350); // 等動畫結束
-        } else {
-          updateCloseBtnVisibility();
-        }
-      });
-    });
-    // 監聽展開/收合時同步顯示 X
-    document.querySelectorAll('.service-category').forEach(function (cat) {
-      cat.addEventListener('transitionend', updateCloseBtnVisibility);
-      cat.addEventListener('mouseenter', updateCloseBtnVisibility);
-      cat.addEventListener('mouseleave', updateCloseBtnVisibility);
-    });
-    window.addEventListener('resize', updateCloseBtnVisibility);
-    updateCloseBtnVisibility();
-  });
-  </script>
+
 
   <style>
         /* 手機版：懸浮服務列表圓角向內、鏡像 */
@@ -2474,11 +2429,15 @@
 
         serviceCategories.forEach(category => {
           category.addEventListener('mouseenter', () => {
+            // Prevent desktop hover open on mobile
+            if (window.innerWidth <= 1023 && !document.body.classList.contains('mobile-preview-mode')) return;
             clearServiceCloseTimer();
             openServiceCategory(category);
           });
 
           category.addEventListener('focusin', () => {
+            // Prevent desktop focus open on mobile
+            if (window.innerWidth <= 1023 && !document.body.classList.contains('mobile-preview-mode')) return;
             clearServiceCloseTimer();
             openServiceCategory(category);
           });
