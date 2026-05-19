@@ -46,7 +46,77 @@
     }
   </script>
 
+  <script>
+  // 手機版懸浮服務列表 X 關閉鍵功能
+  document.addEventListener('DOMContentLoaded', function () {
+    function isMobile() {
+      return window.innerWidth <= 1023 && !document.body.classList.contains('mobile-preview-mode');
+    }
+    function updateCloseBtnVisibility() {
+      document.querySelectorAll('.service-category').forEach(function (cat) {
+        var closeBtn = cat.querySelector('.close-category-btn');
+        if (!closeBtn) return;
+        if (isMobile() && cat.classList.contains('is-open')) {
+          closeBtn.classList.remove('hidden');
+        } else {
+          closeBtn.classList.add('hidden');
+        }
+      });
+    }
+    // 點擊 X 關閉展開的子選單
+    document.querySelectorAll('.close-category-btn').forEach(function (btn) {
+      btn.addEventListener('click', function (e) {
+        e.stopPropagation();
+        var cat = btn.closest('.service-category');
+        var panel = document.getElementById('service-panel');
+        if (cat && cat.classList.contains('is-open')) {
+          cat.classList.remove('is-open');
+          // 若沒有任何 is-open，移除 has-open-category
+          setTimeout(function() {
+            var stillOpen = panel && panel.querySelector('.service-category.is-open');
+            if (!stillOpen && panel) panel.classList.remove('has-open-category');
+            updateCloseBtnVisibility();
+          }, 350); // 等動畫結束
+        } else {
+          updateCloseBtnVisibility();
+        }
+      });
+    });
+    // 監聽展開/收合時同步顯示 X
+    document.querySelectorAll('.service-category').forEach(function (cat) {
+      cat.addEventListener('transitionend', updateCloseBtnVisibility);
+      cat.addEventListener('mouseenter', updateCloseBtnVisibility);
+      cat.addEventListener('mouseleave', updateCloseBtnVisibility);
+    });
+    window.addEventListener('resize', updateCloseBtnVisibility);
+    updateCloseBtnVisibility();
+  });
+  </script>
+
   <style>
+        /* 手機版：懸浮服務列表圓角向內、鏡像 */
+        @media (max-width: 1023px) {
+          #service-panel {
+            left: 0 !important;
+            right: auto !important;
+          }
+          .service-category {
+            border-radius: 0 2rem 2rem 0 !important;
+          }
+          .service-category.is-open {
+            border-radius: 0 2rem 2rem 0 !important;
+          }
+        }
+    /* 右側懸浮服務列表：手機版（非模擬）顯示於左側 */
+    @media (max-width: 1023px) {
+      body:not(.mobile-preview-mode) #service-panel {
+        left: 0 !important;
+        right: auto !important;
+        top: 18% !important;
+        display: flex !important;
+        pointer-events: auto !important;
+      }
+    }
     body { scroll-behavior: smooth; }
 
     /* ── Glass panel ── */
@@ -77,21 +147,26 @@
       display: inline-flex;
       align-items: center;
       cursor: pointer;
-      transition: color .2s ease;
+      padding-bottom: 2px;
+      transition: color .2s ease, transform .2s ease;
     }
-    .nav-item:hover { color: var(--color-nature-600, #4A5B4C); }
+    .nav-item:hover {
+      color: var(--color-nature-600, #4A5B4C);
+      transform: translateY(-1px);
+    }
     .nav-item.has-dropdown::after {
       content: '';
       position: absolute;
       left: 0;
       right: 0;
-      bottom: -8px;
-      height: 2px;
+      bottom: -10px;
+      height: 3px;
       border-radius: 9999px;
-      background: currentColor;
+      background: linear-gradient(90deg, transparent, currentColor 18%, currentColor 82%, transparent);
       transform: scaleX(0);
       transform-origin: center;
-      transition: transform .2s ease;
+      transition: transform .24s ease;
+      opacity: .85;
     }
     .nav-item:hover.has-dropdown::after,
     .nav-item.expanded-menu.has-dropdown::after { transform: scaleX(1); }
@@ -101,28 +176,30 @@
       position: absolute;
       top: 100%;
       left: 0;
-      background: #fff;
-      border-radius: 14px;
-      box-shadow: 0 18px 40px rgba(45,51,47,.14);
-      border: 1px solid rgba(229,231,235,.95);
-      min-width: 180px;
-      padding: 10px 0;
-      margin-top: 10px;
+      background: rgba(255,255,255,.96);
+      backdrop-filter: blur(16px);
+      border-radius: 18px;
+      box-shadow: 0 24px 50px rgba(45,51,47,.16);
+      border: 1px solid rgba(229,231,235,.9);
+      min-width: 220px;
+      padding: 12px 0;
+      margin-top: 16px;
       opacity: 0;
       visibility: hidden;
-      transform: translateY(-10px) scale(.985);
+      transform: translateY(-12px) scale(.98);
       transform-origin: top left;
-      transition: opacity .24s ease, visibility .24s ease, transform .24s cubic-bezier(.175,.885,.32,1.15), box-shadow .24s ease;
-      z-index: 520;
+      transition: opacity .24s ease, visibility .24s ease, transform .28s cubic-bezier(.175,.885,.32,1.15), box-shadow .24s ease;
+      z-index: 640;
       pointer-events: none;
+      overflow: visible;
     }
     .dropdown-menu-1::before {
       content: '';
       position: absolute;
-      top: -20px;
+      top: -36px;
       left: 0;
       right: 0;
-      height: 20px;
+      height: 36px;
       pointer-events: auto;
       background: transparent;
     }
@@ -130,38 +207,105 @@
       opacity: 1;
       visibility: visible;
       transform: translateY(0) scale(1);
-      box-shadow: 0 22px 44px rgba(45,51,47,.18);
+      box-shadow: 0 28px 60px rgba(45,51,47,.18);
       pointer-events: auto;
     }
+    .dropdown-menu-1:hover,
+    .dropdown-menu-2:hover {
+      pointer-events: auto;
+    }
+    .dropdown-menu-1 > .dropdown-item,
+    .dropdown-menu-2 > .dropdown-item {
+      opacity: 0;
+      transform: translateY(-6px);
+      transition: opacity .28s ease, transform .28s ease, background-color .2s ease, color .2s ease;
+    }
+    .nav-item:hover .dropdown-menu-1 > .dropdown-item,
+    .nav-item.expanded-menu .dropdown-menu-1 > .dropdown-item,
+    .dropdown-item:hover .dropdown-menu-2 > .dropdown-item {
+      opacity: 1;
+      transform: translateY(0);
+    }
+    .nav-item:hover .dropdown-menu-1 > .dropdown-item:nth-child(1),
+    .nav-item.expanded-menu .dropdown-menu-1 > .dropdown-item:nth-child(1),
+    .dropdown-item:hover .dropdown-menu-2 > .dropdown-item:nth-child(1) { transition-delay: .04s; }
+    .nav-item:hover .dropdown-menu-1 > .dropdown-item:nth-child(2),
+    .nav-item.expanded-menu .dropdown-menu-1 > .dropdown-item:nth-child(2),
+    .dropdown-item:hover .dropdown-menu-2 > .dropdown-item:nth-child(2) { transition-delay: .08s; }
+    .nav-item:hover .dropdown-menu-1 > .dropdown-item:nth-child(3),
+    .nav-item.expanded-menu .dropdown-menu-1 > .dropdown-item:nth-child(3),
+    .dropdown-item:hover .dropdown-menu-2 > .dropdown-item:nth-child(3) { transition-delay: .12s; }
+    .nav-item:hover .dropdown-menu-1 > .dropdown-item:nth-child(4),
+    .nav-item.expanded-menu .dropdown-menu-1 > .dropdown-item:nth-child(4),
+    .dropdown-item:hover .dropdown-menu-2 > .dropdown-item:nth-child(4) { transition-delay: .16s; }
+    .nav-item:hover .dropdown-menu-1 > .dropdown-item:nth-child(5),
+    .nav-item.expanded-menu .dropdown-menu-1 > .dropdown-item:nth-child(5),
+    .dropdown-item:hover .dropdown-menu-2 > .dropdown-item:nth-child(5) { transition-delay: .2s; }
     
     /* 第二層下拉菜單 */
     .dropdown-menu-2 {
       position: absolute;
       top: 0;
       left: 100%;
-      background: #fff;
-      border-radius: 8px;
-      box-shadow: 0 8px 24px rgba(0,0,0,.12);
-      border: 1px solid #e5e7eb;
-      min-width: 160px;
-      padding: 8px 0;
-      margin-left: 4px;
+      background: rgba(255,255,255,.98);
+      backdrop-filter: blur(14px);
+      border-radius: 16px;
+      box-shadow: 0 18px 36px rgba(45,51,47,.14);
+      border: 1px solid rgba(229,231,235,.95);
+      min-width: 270px;
+      padding: 12px 0;
+      margin-left: 14px;
       opacity: 0;
       visibility: hidden;
-      transform: translateX(-8px);
-      transition: opacity .25s ease, visibility .25s ease, transform .25s ease;
-      z-index: 521;
+      transform: translateX(-10px) scale(.985);
+      transition: opacity .25s ease, visibility .25s ease, transform .28s ease;
+      z-index: 641;
       pointer-events: none;
+    }
+    .dropdown-menu-2::before {
+      content: '';
+      position: absolute;
+      left: -24px;
+      top: 0;
+      width: 24px;
+      height: 100%;
+      background: transparent;
+      pointer-events: auto;
     }
 
     /* 確保 Header、下拉選單與功能匡線層級高於 Hero */
     #mock-header {
-      position: relative;
-      z-index: 500;
+      position: sticky;
+      top: 112px;
+      z-index: 560;
+      transition: transform .68s cubic-bezier(.175,.885,.32,1.28), top .45s ease, box-shadow .45s ease, opacity .45s ease, background-color .45s ease, border-color .45s ease, padding .45s ease, border-radius .45s ease;
+      will-change: transform;
+      transform-origin: top center;
+    }
+    #mock-header.header-floating {
+      background: rgba(255,255,255,.88);
+      backdrop-filter: blur(18px) saturate(150%);
+      -webkit-backdrop-filter: blur(18px) saturate(150%);
+      box-shadow: 0 18px 42px rgba(45,51,47,.12), inset 0 1px 0 rgba(255,255,255,.72);
+      border-color: rgba(229,231,235,.82);
+      border-radius: 24px;
+    }
+    #mock-header.header-hidden {
+      transform: translateY(-145%) scale(.955);
+      opacity: .98;
+    }
+    body.header-scrolled #mock-header {
+      top: 104px;
+      padding-top: .85rem;
+      padding-bottom: .85rem;
+      transform: scale(.965);
     }
     #hero-banner {
       position: relative;
       z-index: 1;
+    }
+    #mock-header nav {
+      z-index: 700 !important;
     }
     .dropdown-item:hover .dropdown-menu-2 {
       opacity: 1;
@@ -173,11 +317,12 @@
     /* 菜單項目 */
     .dropdown-item {
       position: relative;
-      padding: 10px 16px;
+      padding: 12px 18px 12px 34px;
       color: #4b5563;
-      font-size: .9rem;
+      font-size: .92rem;
+      line-height: 1.35;
       cursor: pointer;
-      transition: background .2s ease, color .2s ease;
+      transition: background .2s ease, color .2s ease, transform .2s ease;
       display: flex;
       align-items: center;
       justify-content: space-between;
@@ -186,20 +331,21 @@
     .dropdown-item::before {
       content: '';
       position: absolute;
-      left: 10px;
+      left: 16px;
       top: 50%;
-      width: 4px;
-      height: 4px;
+      width: 6px;
+      height: 6px;
       border-radius: 9999px;
-      background: #C27B72;
+      background: linear-gradient(180deg, #D9ADAA, #C27B72);
       transform: translateY(-50%) scale(0);
       transition: transform .2s ease, opacity .2s ease;
       opacity: 0;
+      box-shadow: 0 0 0 3px rgba(194,123,114,.08);
     }
     .dropdown-item:hover {
       background: linear-gradient(90deg, rgba(242,244,241,.96), rgba(255,255,255,1));
       color: #2D332F;
-      transform: translateX(4px);
+      transform: translateX(6px);
     }
     .dropdown-item:hover::before {
       transform: translateY(-50%) scale(1);
@@ -219,6 +365,67 @@
     .dropdown-item:hover.has-submenu::after {
       transform: translateX(4px);
       color: #4b5563;
+    }
+    .dropdown-item:hover .dropdown-menu-2 {
+      opacity: 1;
+      visibility: visible;
+      transform: translateX(0) scale(1);
+      pointer-events: auto;
+    }
+
+    .dropdown-item.has-submenu {
+      padding-right: 44px;
+    }
+
+    .dropdown-menu-2 .dropdown-item {
+      align-items: flex-start;
+      justify-content: flex-start;
+      gap: 14px;
+      padding: 16px 18px 16px 46px;
+      white-space: normal;
+    }
+    .dropdown-menu-2 .dropdown-item::before {
+      left: 18px;
+      top: 24px;
+    }
+    .submenu-demo-copy {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      min-width: 0;
+      flex: 1;
+    }
+    .submenu-demo-title {
+      font-size: .95rem;
+      font-weight: 700;
+      line-height: 1.45;
+      color: #374151;
+    }
+    .submenu-demo-desc {
+      font-size: .78rem;
+      line-height: 1.55;
+      color: #8a9a8b;
+    }
+    .submenu-demo-badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      min-width: 38px;
+      padding: 4px 8px;
+      border-radius: 9999px;
+      background: linear-gradient(180deg, rgba(217,173,170,.22), rgba(194,123,114,.14));
+      color: #9E4F48;
+      font-size: .68rem;
+      font-weight: 800;
+      letter-spacing: .08em;
+      text-transform: uppercase;
+      margin-top: 1px;
+    }
+    .submenu-demo-item:hover .submenu-demo-title {
+      color: #2D332F;
+    }
+    .submenu-demo-item:hover .submenu-demo-desc {
+      color: #6b7a6d;
     }
 
     /* 導航項目展開指示符 */
@@ -290,6 +497,25 @@
        ══════════════════════════════════════════ */
     .annotation-wrapper { transition: all .35s ease; }
 
+    /* 導覽列說明框：預設在 Mock Header 上方，若被頂部控制列遮擋則切到右下方 */
+    #ann-uiux-nav {
+      top: auto;
+      bottom: calc(100% + 10px);
+      left: 50%;
+      right: auto;
+      transform: translateX(-50%);
+      width: 24rem;
+      transition: top .3s ease, bottom .3s ease, left .3s ease, right .3s ease, transform .3s ease;
+    }
+    #ann-uiux-nav.nav-right-fallback {
+      top: calc(100% + 8px);
+      bottom: auto;
+      left: auto;
+      right: 8px;
+      transform: none;
+      width: min(24rem, calc(100vw - 40px));
+    }
+
     /* Dimmed（預設）：內容隱藏，虛線框淡化 */
     .annotation-dimmed .annotation-content {
       opacity: 0;
@@ -309,6 +535,13 @@
       visibility: visible;
       transform: translateY(0) scale(1);
       transition: all .4s cubic-bezier(.175, .885, .32, 1.275);
+    }
+    .annotation-wrapper.annotation-soft-fade .annotation-content {
+      opacity: 0 !important;
+      visibility: visible;
+      transform: translateY(6px) scale(.985);
+      pointer-events: none;
+      transition: opacity .62s ease, transform .62s cubic-bezier(.22, .61, .36, 1);
     }
     .annotation-active .annotation-dash {
       display: none !important;
@@ -360,6 +593,11 @@
     button.feature-dash-border.is-active::before {
       border-radius: 9999px;
       inset: -12px;
+    }
+
+    #floating-cta-wrap.feature-dash-border::before {
+      inset: 0px;
+      border-radius: 20px;
     }
     
     #hero-banner.feature-dash-border.is-active::before {
@@ -490,6 +728,175 @@
       animation: mobileMenuEnter .26s ease-out;
       transform-origin: top right;
     }
+
+    /* ── Mobile Feature Navigator：手機版重點導覽 ── */
+    .mobile-feature-hub {
+      display: none;
+    }
+    .mobile-feature-trigger {
+      position: fixed;
+      left: 12px;
+      right: 90px;
+      bottom: 14px;
+      z-index: 176;
+      min-height: 52px;
+      border-radius: 16px;
+      border: 1px solid rgba(213, 220, 214, 0.95);
+      background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(245,247,244,0.96));
+      box-shadow: 0 16px 28px rgba(45,51,47,.12);
+      color: #2d332f;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      padding: 10px 14px;
+      font-size: .92rem;
+      font-weight: 700;
+      letter-spacing: .03em;
+    }
+    .mobile-tap-hint {
+      position: fixed;
+      left: 12px;
+      right: 90px;
+      bottom: 76px;
+      z-index: 175;
+      min-height: 42px;
+      border-radius: 14px;
+      border: 1px dashed rgba(194, 123, 114, 0.55);
+      background: rgba(255, 255, 255, 0.94);
+      color: #7A3C36;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      padding: 9px 12px;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      box-shadow: 0 10px 22px rgba(45,51,47,.1);
+      pointer-events: none;
+      animation: mobileTapHintFloat 2.8s ease-in-out infinite;
+      transition: opacity .25s ease, transform .25s ease;
+    }
+    .mobile-tap-hint.is-muted {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    .mobile-feature-trigger .mobile-feature-current {
+      display: inline-flex;
+      align-items: center;
+      color: #6a746c;
+      font-size: .75rem;
+      font-weight: 700;
+      letter-spacing: .04em;
+      white-space: nowrap;
+      max-width: 44vw;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .mobile-feature-sheet {
+      position: fixed;
+      inset: 0;
+      z-index: 196;
+    }
+    .mobile-feature-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(45, 51, 47, 0.4);
+      backdrop-filter: blur(3px);
+    }
+    .mobile-feature-card {
+      position: absolute;
+      left: 10px;
+      right: 10px;
+      bottom: 10px;
+      border-radius: 24px;
+      border: 1px solid rgba(213, 220, 214, 0.95);
+      background: linear-gradient(180deg, rgba(255,255,255,0.99), rgba(246,248,245,0.98));
+      box-shadow: 0 24px 56px rgba(45,51,47,.2);
+      overflow: hidden;
+    }
+    .mobile-feature-tabs {
+      display: flex;
+      gap: 8px;
+      overflow-x: auto;
+      padding: 12px 14px 10px;
+      border-bottom: 1px solid rgba(229, 231, 235, 0.9);
+      scrollbar-width: none;
+    }
+    .mobile-feature-tabs::-webkit-scrollbar {
+      display: none;
+    }
+    .mobile-feature-tab {
+      flex: 0 0 auto;
+      border-radius: 9999px;
+      border: 1px solid rgba(213, 220, 214, 0.95);
+      background: rgba(255,255,255,0.88);
+      color: #5f6b63;
+      padding: 8px 12px;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .05em;
+      white-space: nowrap;
+    }
+    .mobile-feature-tab.is-active {
+      border-color: #9E4F48;
+      background: rgba(253, 248, 247, 0.95);
+      color: #9E4F48;
+      box-shadow: 0 8px 18px rgba(194,123,114,.18);
+    }
+    .mobile-feature-list-wrap {
+      padding: 12px 14px 14px;
+      max-height: min(56vh, 430px);
+      overflow-y: auto;
+    }
+    .mobile-feature-list {
+      display: none;
+      grid-template-columns: 1fr;
+      gap: 8px;
+    }
+    .mobile-feature-list.is-active {
+      display: grid;
+    }
+    .mobile-feature-item {
+      width: 100%;
+      text-align: left;
+      border-radius: 14px;
+      border: 1px solid rgba(213, 220, 214, 0.9);
+      background: rgba(255,255,255,0.9);
+      color: #374151;
+      min-height: 46px;
+      padding: 10px 12px;
+      font-size: .9rem;
+      line-height: 1.4;
+      font-weight: 600;
+      transition: all .2s ease;
+    }
+    .mobile-feature-item.is-active {
+      border-color: #9E4F48;
+      background: rgba(194,123,114,.12);
+      color: #7A3C36;
+      box-shadow: 0 9px 18px rgba(194,123,114,.16);
+    }
+    .input-attention-flash {
+      animation: inputAttentionFlash 1s ease-out;
+    }
+    @keyframes inputAttentionFlash {
+      0% {
+        box-shadow: 0 0 0 0 rgba(92,113,94,.42);
+        border-color: rgba(92,113,94,.9);
+        background-color: rgba(234, 243, 235, .95);
+      }
+      70% {
+        box-shadow: 0 0 0 9px rgba(92,113,94,0);
+        border-color: rgba(92,113,94,.45);
+        background-color: rgba(240, 246, 241, .92);
+      }
+      100% {
+        box-shadow: 0 0 0 0 rgba(92,113,94,0);
+        border-color: rgba(209,213,219,1);
+        background-color: rgba(249, 250, 251, 1);
+      }
+    }
     @keyframes mobileMenuEnter {
       from {
         opacity: 0;
@@ -498,6 +905,14 @@
       to {
         opacity: 1;
         transform: translateY(0) scale(1);
+      }
+    }
+    @keyframes mobileTapHintFloat {
+      0%, 100% {
+        transform: translateY(0);
+      }
+      50% {
+        transform: translateY(-3px);
       }
     }
 
@@ -559,28 +974,186 @@
     }
 
     @media (max-width: 768px) {
-      #hero-banner {
-        background-position: 58% 50%;
+      html,
+      body {
+        overflow-x: hidden;
       }
-      .service-category {
+
+      .mobile-feature-hub {
+        display: block;
+      }
+      body:not(.mobile-preview-mode) #top-control-bar {
         display: none;
       }
+      body:not(.mobile-preview-mode) #mobile-feature-trigger {
+        left: 12px;
+        right: 90px;
+        top: auto;
+        bottom: 14px;
+        z-index: 182;
+        min-height: 52px;
+        border-radius: 16px;
+      }
+      body:not(.mobile-preview-mode) #mobile-feature-current {
+        max-width: 38vw;
+      }
+      body:not(.mobile-preview-mode) #page-main {
+        padding-top: 18px;
+      }
+      body:not(.mobile-preview-mode) #mobile-tap-hint {
+        left: 12px;
+        right: 90px;
+        top: auto;
+        bottom: 76px;
+        z-index: 183;
+      }
+      body:not(.mobile-preview-mode) #mock-header {
+        top: 0;
+        z-index: 188;
+      }
+      body:not(.mobile-preview-mode).header-scrolled #mock-header {
+        top: 0;
+        transform: scale(.965);
+        padding-top: .85rem;
+        padding-bottom: .85rem;
+      }
+      @media (max-width: 768px) {
+        body:not(.mobile-preview-mode).header-scrolled #mock-header {
+          top: 16px;
+          transform: scale(.965);
+          padding-top: .85rem;
+          padding-bottom: .85rem;
+        }
+      }
+      body:not(.mobile-preview-mode) #sticky-cta-container {
+        left: auto !important;
+        right: 10px;
+        top: auto !important;
+        bottom: 132px;
+      }
+      body {
+        background:
+          radial-gradient(circle at 12% -8%, rgba(213, 220, 214, 0.55), transparent 46%),
+          radial-gradient(circle at 88% 18%, rgba(237, 212, 210, 0.4), transparent 40%),
+          #f4f5f2;
+      }
+      #top-control-bar {
+        padding: 14px 14px 12px;
+        align-items: flex-start;
+      }
+      #top-control-bar h1 {
+        font-size: 1.95rem;
+        line-height: 1.16;
+      }
+      #top-control-bar p {
+        font-size: .98rem;
+        line-height: 1.58;
+        margin-top: 6px;
+        max-width: 21rem;
+      }
+      #toggleAnnotations {
+        width: 100%;
+        min-height: 52px;
+        justify-content: center;
+        font-size: 1.02rem;
+        border-radius: 18px;
+      }
+      #toggleAnnotations i {
+        font-size: 1.2rem;
+      }
+      #page-main {
+        padding-top: 18px;
+      }
+      #preview-browser {
+        border-radius: 20px;
+        margin-bottom: 56px;
+      }
+      #preview-browser > .bg-gray-100 {
+        border-top-left-radius: 20px;
+        border-top-right-radius: 20px;
+        padding-top: 14px;
+        padding-bottom: 14px;
+      }
+      #mock-header {
+        border-radius: 0 0 20px 20px;
+      }
+      #hero-banner {
+        min-height: 460px;
+        padding-top: 112px;
+        padding-bottom: 188px;
+        background-position: 62% 50%;
+      }
+      #hero-banner h2 {
+        font-size: clamp(2.15rem, 9vw, 2.75rem);
+        line-height: 1.2;
+        letter-spacing: .06em;
+      }
+      #hero-banner p {
+        letter-spacing: .06em;
+      }
+      #hero-cta-btn {
+        width: 100%;
+        min-height: 52px;
+        padding-left: 24px;
+        padding-right: 24px;
+      }
+      /* .service-category { display: none; }  // 移除隱藏，讓手機版顯示 */
       .sticky-cta-container { z-index: 120; }
+      #preview-browser > .relative {
+        padding-bottom: 56px;
+      }
+      #preview-browser .max-w-5xl,
+      #preview-browser section.max-w-5xl,
+      #preview-browser #tech-grid,
+      #preview-browser #contact-map-grid {
+        padding-left: 16px !important;
+        padding-right: 16px !important;
+      }
       #tech-grid {
         grid-template-columns: 1fr !important;
-        gap: 14px !important;
+        gap: 12px !important;
       }
       #tech-grid [id^="card-"] {
-        padding: 16px !important;
+        padding: 15px !important;
+        border-radius: 18px;
       }
       #tech-grid [id^="card-"] h3 {
-        font-size: 1.2rem !important;
-        line-height: 1.45 !important;
+        font-size: 1.12rem !important;
+        line-height: 1.4 !important;
         word-break: break-word;
       }
       #tech-grid [id^="card-"] p {
         margin-left: 0 !important;
-        line-height: 1.7;
+        line-height: 1.62;
+      }
+      #contact-map-grid {
+        margin-top: 52px !important;
+        gap: 18px !important;
+      }
+      #form-card,
+      #map-card {
+        border-radius: 20px;
+      }
+      #form-card {
+        padding: 20px !important;
+      }
+      #contact-form input,
+      #contact-form textarea,
+      #form-submit {
+        font-size: 16px;
+      }
+      #form-submit {
+        min-height: 52px;
+      }
+      #map-card iframe {
+        min-height: 260px !important;
+      }
+      #map-card .flex.items-center.gap-3 {
+        padding-top: 11px;
+        padding-bottom: 12px;
+      }
+      #map-card .flex.items-center.gap-3 span {
+        display: none;
       }
 
       /* 手機版：CTA 與 Footer 可讀性優化 */
@@ -599,6 +1172,7 @@
       #preview-browser .cta-actions button {
         width: 100%;
         text-align: center;
+        min-height: 50px;
       }
       #preview-browser .cta-stats {
         padding: 16px !important;
@@ -617,6 +1191,46 @@
         flex-direction: column;
         align-items: flex-start;
       }
+      #preview-browser .footer-meta > div {
+        flex-wrap: wrap;
+        row-gap: 8px;
+      }
+
+      /* 移動設備上的虛線框可視強化 */
+      .feature-dash-border.is-dimmed::before {
+        opacity: 0.32;
+      }
+    }
+
+    @media (max-width: 420px) {
+      .mobile-feature-trigger {
+        right: 84px;
+      }
+      .mobile-tap-hint {
+        right: 84px;
+      }
+      #top-control-bar h1 {
+        font-size: 1.78rem;
+      }
+      #hero-banner {
+        min-height: 420px;
+        padding-top: 98px;
+        padding-bottom: 160px;
+      }
+      #hero-banner h2 {
+        letter-spacing: .03em;
+      }
+      #preview-browser > .bg-gray-100 {
+        padding-left: 12px;
+        padding-right: 12px;
+      }
+      #preview-browser .max-w-5xl,
+      #preview-browser section.max-w-5xl,
+      #preview-browser #tech-grid,
+      #preview-browser #contact-map-grid {
+        padding-left: 12px !important;
+        padding-right: 12px !important;
+      }
     }
   </style>
 </head>
@@ -631,7 +1245,7 @@
 
     <!-- ① 介面設計與體驗 -->
     <div class="service-category bg-white text-morandi-700 rounded-l-2xl shadow-xl border border-morandi-200 border-r-0 pointer-events-auto">
-      <div class="flex items-center gap-4 p-3 min-w-[17.5rem]">
+      <div class="flex items-center gap-4 p-3 min-w-[17.5rem] relative">
         <div class="cat-icon-box min-w-[3rem] w-12 h-12 rounded-full bg-morandi-50 text-morandi-500 flex items-center justify-center text-2xl shadow-inner flex-shrink-0">
           <i class="ph ph-paint-brush-broad"></i>
         </div>
@@ -639,6 +1253,10 @@
           <h4 class="font-bold text-sm tracking-wide">介面設計與體驗</h4>
           <p class="text-[11px] opacity-60 mt-0.5">UI/UX Experience</p>
         </div>
+        <!-- X 關閉鍵，僅手機版顯示 -->
+        <button class="close-category-btn absolute top-2 right-2 hidden" aria-label="關閉" style="z-index:10">
+          <i class="ph ph-x text-lg"></i>
+        </button>
       </div>
       <div class="sub-menu px-5 pb-4">
         <ul class="text-[13px] space-y-2.5 border-l border-white/25 pl-4 ml-3">
@@ -660,7 +1278,7 @@
 
     <!-- ② 轉換策略與成效 -->
     <div class="service-category bg-white text-morandi-700 rounded-l-2xl shadow-xl border border-morandi-200 border-r-0 pointer-events-auto">
-      <div class="flex items-center gap-4 p-3 min-w-[17.5rem]">
+      <div class="flex items-center gap-4 p-3 min-w-[17.5rem] relative">
         <div class="cat-icon-box min-w-[3rem] w-12 h-12 rounded-full bg-morandi-50 text-morandi-500 flex items-center justify-center text-2xl shadow-inner flex-shrink-0">
           <i class="ph ph-chart-line-up"></i>
         </div>
@@ -668,6 +1286,9 @@
           <h4 class="font-bold text-sm tracking-wide">轉換策略與成效</h4>
           <p class="text-[11px] opacity-60 mt-0.5">Conversion Strategy</p>
         </div>
+        <button class="close-category-btn absolute top-2 right-2 hidden" aria-label="關閉" style="z-index:10">
+          <i class="ph ph-x text-lg"></i>
+        </button>
       </div>
       <div class="sub-menu px-5 pb-4">
         <ul class="text-[13px] space-y-2.5 border-l border-white/25 pl-4 ml-3">
@@ -689,7 +1310,7 @@
 
     <!-- ③ 開發技術與 SEO -->
     <div class="service-category bg-white text-morandi-700 rounded-l-2xl shadow-xl border border-morandi-200 border-r-0 pointer-events-auto">
-      <div class="flex items-center gap-4 p-3 min-w-[17.5rem]">
+      <div class="flex items-center gap-4 p-3 min-w-[17.5rem] relative">
         <div class="cat-icon-box min-w-[3rem] w-12 h-12 rounded-full bg-morandi-50 text-morandi-500 flex items-center justify-center text-2xl shadow-inner flex-shrink-0">
           <i class="ph ph-lightning"></i>
         </div>
@@ -697,6 +1318,9 @@
           <h4 class="font-bold text-sm tracking-wide">開發技術與 SEO</h4>
           <p class="text-[11px] opacity-60 mt-0.5">Development &amp; SEO</p>
         </div>
+        <button class="close-category-btn absolute top-2 right-2 hidden" aria-label="關閉" style="z-index:10">
+          <i class="ph ph-x text-lg"></i>
+        </button>
       </div>
       <div class="sub-menu px-5 pb-4">
         <ul class="text-[13px] space-y-2.5 border-l border-white/25 pl-4 ml-3">
@@ -718,7 +1342,7 @@
 
     <!-- ④ 維運管理與資安 -->
     <div class="service-category bg-white text-morandi-700 rounded-l-2xl shadow-xl border border-morandi-200 border-r-0 pointer-events-auto">
-      <div class="flex items-center gap-4 p-3 min-w-[17.5rem]">
+      <div class="flex items-center gap-4 p-3 min-w-[17.5rem] relative">
         <div class="cat-icon-box min-w-[3rem] w-12 h-12 rounded-full bg-morandi-50 text-morandi-500 flex items-center justify-center text-2xl shadow-inner flex-shrink-0">
           <i class="ph ph-shield-check"></i>
         </div>
@@ -726,6 +1350,9 @@
           <h4 class="font-bold text-sm tracking-wide">維運管理與資安</h4>
           <p class="text-[11px] opacity-60 mt-0.5">Ops &amp; Security</p>
         </div>
+        <button class="close-category-btn absolute top-2 right-2 hidden" aria-label="關閉" style="z-index:10">
+          <i class="ph ph-x text-lg"></i>
+        </button>
       </div>
       <div class="sub-menu px-5 pb-4">
         <ul class="text-[13px] space-y-2.5 border-l border-white/25 pl-4 ml-3">
@@ -741,13 +1368,22 @@
 
   </div><!-- / float service list -->
 
+
   <!-- ═══════════════════════════════════════════════════
        浮動 CTA（與右側服務列表同層級）
        ═══════════════════════════════════════════════════ -->
   <div id="sticky-cta-container" class="sticky-cta-container">
-    <div id="floating-cta-wrap" class="relative feature-dash-border is-dimmed">
-      <div class="w-16 h-16 bg-nature-500 text-white rounded-full flex items-center justify-center shadow-xl relative z-10">
-        <i class="ph-fill ph-chat-teardrop-dots text-3xl"></i>
+    <div id="floating-cta-wrap" class="relative feature-dash-border is-dimmed flex flex-col items-center gap-3 px-4 py-4">
+      <a id="floating-cta-phone" href="tel:0973591518" aria-label="撥打 0973591518" class="w-16 h-16 rounded-full bg-white text-nature-600 border border-nature-200 shadow-xl flex items-center justify-center relative z-10 transition-transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-nature-200">
+        <i class="ph-fill ph-phone-call text-2xl"></i>
+      </a>
+      <a href="https://line.me/ti/p/~tp6yj" target="_blank" rel="noreferrer" aria-label="開啟 LINE 聯絡" class="w-16 h-16 rounded-full bg-nature-500 text-white border border-nature-400 shadow-xl flex items-center justify-center relative z-10 transition-transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-nature-200">
+        <span class="text-[11px] font-black tracking-[0.14em]">LINE</span>
+      </a>
+      <div class="relative z-10">
+        <button id="floating-cta-form" type="button" aria-label="前往聯絡我們表單" class="w-16 h-16 bg-nature-500 text-white rounded-full flex items-center justify-center shadow-xl transition-transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-nature-200">
+          <i class="ph-fill ph-chat-teardrop-dots text-3xl"></i>
+        </button>
       </div>
       <!-- ▌標示：常駐 CTA -->
       <div id="ann-conv-cta" class="annotation-wrapper absolute bottom-0 right-full mr-8 w-72 z-50">
@@ -757,9 +1393,37 @@
             <div class="w-2 h-2 rounded-full bg-white animate-pulse flex-shrink-0"></div>
             <h4 class="font-bold text-sm text-white">常駐型行動呼籲 (Sticky CTAs)</h4>
           </div>
-          <p class="text-xs text-white/85 leading-relaxed">固定懸浮的客服或電話按鈕，極大化客戶諮詢率，打造24小時自動接單業務員。</p>
+          <p class="text-xs text-white/85 leading-relaxed mb-3">固定懸浮的客服入口整合電話直撥、LINE 即時洽詢與表單導流，極大化客戶諮詢率，打造 24 小時自動接單業務員。</p>
+          <div class="flex flex-wrap gap-2">
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/12 text-white text-[11px] border border-white/15"><i class="ph ph-phone-call text-sm"></i> 電話</span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/12 text-white text-[11px] border border-white/15"><i class="ph ph-chat-circle-dots text-sm"></i> LINE</span>
+            <span class="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-white/12 text-white text-[11px] border border-white/15"><i class="ph ph-envelope-simple text-sm"></i> 表單</span>
+          </div>
         </div>
       </div>
+    </div>
+  </div>
+
+  <div id="phone-contact-modal" class="hidden fixed inset-0 z-[220] items-center justify-center px-4">
+    <div id="phone-contact-overlay" class="absolute inset-0 bg-nature-800/45 backdrop-blur-sm"></div>
+    <div class="relative w-full max-w-sm rounded-[28px] border border-white/60 bg-white/95 p-6 shadow-2xl">
+      <button id="phone-contact-close" type="button" aria-label="關閉電話提示" class="absolute top-4 right-4 w-10 h-10 rounded-full border border-gray-200 bg-white text-gray-500 flex items-center justify-center hover:bg-gray-50 transition-colors">
+        <i class="ph ph-x text-xl"></i>
+      </button>
+      <div class="w-14 h-14 rounded-2xl bg-nature-50 text-nature-600 border border-nature-100 flex items-center justify-center shadow-sm mb-5">
+        <i class="ph-fill ph-phone-call text-2xl"></i>
+      </div>
+      <p class="text-xs tracking-[0.2em] uppercase text-nature-500 mb-2">Desk Call Prompt</p>
+      <h3 class="text-2xl font-bold text-nature-800 mb-2">撥打電話</h3>
+      <p class="text-sm text-gray-500 leading-relaxed mb-5">桌機環境無法直接撥號，請使用手機撥打，或先複製以下電話號碼。</p>
+      <div class="rounded-2xl border border-nature-100 bg-nature-50/80 px-4 py-4 mb-4">
+        <p id="phone-contact-number" class="text-2xl font-bold tracking-[0.08em] text-nature-800">0973591518</p>
+      </div>
+      <div class="flex gap-3">
+        <button id="phone-contact-copy" type="button" class="flex-1 rounded-full bg-nature-500 text-white font-bold py-3 shadow-md hover:bg-nature-600 transition-colors">複製號碼</button>
+        <a href="tel:0973591518" class="flex-1 rounded-full border border-nature-200 text-nature-700 font-bold py-3 text-center hover:bg-nature-50 transition-colors">仍要撥號</a>
+      </div>
+      <p id="phone-contact-feedback" class="mt-3 text-xs text-nature-600 h-4"></p>
     </div>
   </div>
 
@@ -767,20 +1431,21 @@
   <!-- ═══════════════════════════════════════
        頂部控制列
        ═══════════════════════════════════════ -->
-  <div class="sticky top-0 z-[60] glass-panel border-b border-gray-200 px-6 py-4 flex justify-between items-center shadow-sm">
+  <div id="top-control-bar" class="sticky top-0 z-[60] glass-panel border-b border-gray-200 px-6 py-4 flex justify-between items-center gap-3 md:gap-5 shadow-sm">
     <div class="flex items-center gap-3">
       <div class="w-10 h-10 rounded-full bg-nature-500 text-white flex items-center justify-center shadow-lg flex-shrink-0">
         <i class="ph-fill ph-crown text-xl"></i>
       </div>
       <div>
-        <h1 class="text-2xl font-serif font-bold text-nature-800">丹淳 Danchun 官網提案</h1>
-        <p class="text-sm text-gray-500 mt-0.5">
-          將滑鼠移至<span class="text-morandi-500 font-semibold">右側服務列表</span>，檢視丹淳品牌官網的互動提案重點
+        <h1 class="text-xl sm:text-2xl font-serif font-bold text-nature-800">丹淳 Danchun 官網提案</h1>
+        <p class="text-sm text-gray-500 mt-0.5 leading-relaxed">
+          <span class="hidden md:inline">將滑鼠移至<span class="text-morandi-500 font-semibold">右側服務列表</span>，檢視丹淳品牌官網的互動提案重點</span>
+          <span class="md:hidden">點選下方<span class="text-morandi-500 font-semibold">手機版重點導覽</span>，逐項探索網站設計特點</span>
         </p>
       </div>
     </div>
     <button id="toggleAnnotations"
-      class="flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all bg-nature-50 border border-nature-200 text-nature-700 hover:bg-nature-100">
+      class="flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all bg-nature-50 border border-nature-200 text-nature-700 hover:bg-nature-100 shrink-0">
       <i class="ph ph-eye text-lg"></i>
       <span>強制顯示所有標示</span>
     </button>
@@ -790,30 +1455,12 @@
   <!-- ═══════════════════════════════════════
        主內容
        ═══════════════════════════════════════ -->
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 pt-12">
-
-    <!-- 區塊一標題 -->
-    <div class="mb-8 flex items-center gap-3 fade-in">
-      <div class="w-1.5 h-8 bg-nature-500 rounded-full flex-shrink-0"></div>
-      <h2 class="text-2xl font-bold text-nature-800">前端視覺與轉換動線 (UI/UX &amp; Conversion)</h2>
-    </div>
+  <div id="page-main" class="max-w-7xl mx-auto px-4 sm:px-6 pt-12">
 
     <!-- ─────────────────────────────────────────
          模擬瀏覽器視窗
          ───────────────────────────────────────── -->
     <div id="preview-browser" class="preview-browser bg-white rounded-t-xl rounded-b-lg shadow-2xl overflow-visible border border-gray-200 mb-24 relative fade-in" style="animation-delay:.1s">
-
-      <!-- ▌標示：導覽列 / 置頂選單 (移到外部，避免 overflow 裁切) -->
-      <div id="ann-uiux-nav" class="annotation-wrapper absolute -top-[60px] left-1/2 -translate-x-1/2 w-[30rem] z-[9999]" style="pointer-events: auto;">
-        <div class="absolute inset-0 rounded-lg annotation-dash pointer-events-none border-2"></div>
-        <div class="annotation-content ann-box relative p-4 rounded-xl shadow-2xl">
-          <div class="flex items-center gap-2 mb-2 pb-2 border-b border-white/20">
-            <div class="w-2 h-2 rounded-full bg-white animate-pulse flex-shrink-0"></div>
-            <h4 class="font-bold text-base text-white">智慧型置頂選單 &amp; 動態導覽</h4>
-          </div>
-          <p class="text-sm text-white/85 leading-relaxed">包含多層次下拉選單。向下捲動時，導覽列自動縮小並吸附於螢幕頂端，永遠觸手可及。</p>
-        </div>
-      </div>
 
       <!-- 瀏覽器標題列 -->
       <div class="bg-gray-100 px-4 py-3 border-b border-gray-200 flex items-center gap-2">
@@ -839,11 +1486,11 @@
 
         <!-- ── Mock Header ── -->
         <div class="relative">
-          <header id="mock-header" class="px-8 py-5 flex justify-between items-center bg-white border-b border-gray-100 shadow-sm relative feature-dash-border is-dimmed">
+          <header id="mock-header" class="px-4 sm:px-8 py-4 sm:py-5 flex justify-between items-center bg-white border-b border-gray-100 shadow-sm relative feature-dash-border is-dimmed">
             <!-- Logo -->
             <div class="flex items-center gap-2 text-nature-500">
-              <i class="ph ph-flower-lotus text-3xl"></i>
-              <div class="font-serif font-bold text-xl leading-none tracking-widest text-nature-800">
+              <i class="ph ph-flower-lotus text-[30px] sm:text-3xl"></i>
+              <div class="font-serif font-bold text-lg sm:text-xl leading-none tracking-[0.14em] sm:tracking-widest text-nature-800">
                 丹淳<br><span class="text-sm font-sans tracking-[.2em] text-nature-500">DANCHUN</span>
               </div>
             </div>
@@ -912,11 +1559,11 @@
               </div>
             </nav>
             <!-- Icons -->
-            <div class="flex items-center gap-4 text-gray-500">
+            <div class="flex items-center gap-2 sm:gap-4 text-gray-500">
 
               <!-- 語言按鈕 + 標示：多語系 -->
               <div id="lang-switch" class="relative">
-                <div id="lang-switch-btn" class="flex items-center gap-1 text-sm border border-gray-200 px-2 py-1 rounded hover:bg-gray-50 cursor-pointer transition-colors relative z-10 feature-dash-border is-dimmed">
+                <div id="lang-switch-btn" class="flex items-center gap-1 text-xs sm:text-sm border border-gray-200 px-2 py-1 rounded hover:bg-gray-50 cursor-pointer transition-colors relative z-10 feature-dash-border is-dimmed">
                   <i class="ph ph-globe-hemisphere-west text-lg"></i> 中文
                 </div>
                 <div id="ann-conv-lang" class="annotation-wrapper absolute top-full mt-4 right-0 w-64 z-50">
@@ -931,8 +1578,6 @@
                 </div>
               </div>
 
-              <i class="ph ph-magnifying-glass text-xl"></i>
-              <i class="ph ph-envelope-simple text-xl"></i>
               <button id="mobile-menu-toggle" class="mobile-menu-toggle-btn lg:hidden w-14 h-14 rounded-2xl border border-gray-200 flex items-center justify-center transition-colors" aria-label="開啟選單" aria-expanded="false" aria-controls="mobile-menu-panel">
                 <i class="ph ph-list text-2xl"></i>
               </button>
@@ -984,6 +1629,18 @@
                     <a href="#" class="mobile-menu-pill">專案諮詢</a>
                   </div>
                 </div>
+              </div>
+            </div>
+
+            <!-- ▌標示：導覽列 / 置頂選單（緊貼 Mock Header 下方） -->
+            <div id="ann-uiux-nav" class="annotation-wrapper absolute mt-2 z-[570]" style="pointer-events: auto;">
+              <div class="absolute inset-0 rounded-lg annotation-dash pointer-events-none border-2"></div>
+              <div class="annotation-content ann-box relative p-4 rounded-xl shadow-2xl">
+                <div class="flex items-center gap-2 mb-2 pb-2 border-b border-white/20">
+                  <div class="w-2 h-2 rounded-full bg-white animate-pulse flex-shrink-0"></div>
+                  <h4 class="font-bold text-base text-white">智慧型置頂選單 &amp; 動態導覽</h4>
+                </div>
+                <p class="text-sm text-white/85 leading-relaxed">包含多層次下拉選單。向下捲動時，導覽列自動縮小並吸附於螢幕頂端，永遠觸手可及。</p>
               </div>
             </div>
           </header>
@@ -1053,7 +1710,7 @@
           <div class="bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">01</div>
           <h3 class="text-lg font-bold text-nature-800">CDN 國際節點極速分發</h3>
         </div>
-        <p class="text-gray-600 text-sm leading-relaxed ml-[4.5rem]">網站部署於全球內容傳遞網路（CDN），無論客戶在台灣或海外，皆能享受「不到一秒」的極速載入體驗。</p>
+        <p class="text-gray-600 text-sm leading-relaxed">網站部署於全球內容傳遞網路（CDN），無論客戶在台灣或海外，皆能享受「不到一秒」的極速載入體驗。</p>
       </div>
 
       <div id="card-tech-img" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
@@ -1061,7 +1718,7 @@
           <div class="bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">02</div>
           <h3 class="text-lg font-bold text-nature-800">次世代圖片壓縮技術</h3>
         </div>
-        <p class="text-gray-600 text-sm leading-relaxed ml-[4.5rem]">全站圖片自動轉換為 Google 推薦的 WebP 等次世代格式，在保持高畫質的同時，將檔案體積壓縮至最小，大幅提升速度。</p>
+        <p class="text-gray-600 text-sm leading-relaxed">全站圖片自動轉換為 Google 推薦的 WebP 等次世代格式，在保持高畫質的同時，將檔案體積壓縮至最小，大幅提升速度。</p>
       </div>
 
       <div id="card-tech-seo" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
@@ -1069,7 +1726,7 @@
           <div class="bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">03</div>
           <h3 class="text-lg font-bold text-nature-800">技術型 SEO 標籤佈署</h3>
         </div>
-        <p class="text-gray-600 text-sm leading-relaxed ml-[4.5rem]">每一個頁面皆可獨立設定 SEO 標題（Meta Title）與描述（Meta Description），並自動生成 Sitemap 提交給 Google。</p>
+        <p class="text-gray-600 text-sm leading-relaxed">每一個頁面皆可獨立設定 SEO 標題（Meta Title）與描述（Meta Description），並自動生成 Sitemap 提交給 Google。</p>
       </div>
 
       <div id="card-tech-social" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
@@ -1077,7 +1734,7 @@
           <div class="bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">04</div>
           <h3 class="text-lg font-bold text-nature-800">社群分享優化 (Open Graph)</h3>
         </div>
-        <p class="text-gray-600 text-sm leading-relaxed ml-[4.5rem]">確保當您的網址被貼在 Line 或 Facebook 時，會自動抓取最完美的品牌縮圖與吸睛標題。</p>
+        <p class="text-gray-600 text-sm leading-relaxed">確保當您的網址被貼在 Line 或 Facebook 時，會自動抓取最完美的品牌縮圖與吸睛標題。</p>
       </div>
 
       <div id="card-sec-serverless" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
@@ -1085,7 +1742,7 @@
           <div class="bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">05</div>
           <h3 class="text-lg font-bold text-nature-800">無伺服器軍規防駭架構</h3>
         </div>
-        <p class="text-gray-600 text-sm leading-relaxed ml-[4.5rem]">採用現代化靜態架構，徹底捨棄傳統資料庫。因沒有資料庫後門，駭客無從進行 SQL 注入，提供最高級別資安。</p>
+        <p class="text-gray-600 text-sm leading-relaxed">採用現代化靜態架構，徹底捨棄傳統資料庫。因沒有資料庫後門，駭客無從進行 SQL 注入，提供最高級別資安。</p>
       </div>
 
       <div id="card-sec-cms" class="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
@@ -1093,7 +1750,7 @@
           <div class="bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">06</div>
           <h3 class="text-lg font-bold text-nature-800">輕量級智能內容後台 (Headless CMS)</h3>
         </div>
-        <p class="text-gray-600 text-sm leading-relaxed ml-[4.5rem]">針對「最新消息」或「作品案例」提供如 Notion 般直覺的無頭式後台，自動更新網頁且絕對不會破壞首頁排版。</p>
+        <p class="text-gray-600 text-sm leading-relaxed">針對「最新消息」或「作品案例」提供如 Notion 般直覺的無頭式後台，自動更新網頁且絕對不會破壞首頁排版。</p>
       </div>
 
     </div><!-- / grid -->
@@ -1145,8 +1802,8 @@
               </div>
             </form>
             <!-- ▌標示：防垃圾表單 -->
-            <div id="ann-conv-form" class="annotation-wrapper absolute bottom-full mb-6 left-4 w-64 z-50">
-              <div class="absolute -inset-4 rounded-2xl annotation-dash pointer-events-none border-2"></div>
+            <div id="ann-conv-form" class="annotation-wrapper absolute bottom-4 left-4 w-64 z-[160]">
+              <div class="absolute inset-0 rounded-2xl annotation-dash pointer-events-none border-2"></div>
               <div class="annotation-content ann-box relative p-4 rounded-xl shadow-2xl float-anim">
                 <div class="flex items-center gap-2 mb-2 pb-2 border-b border-white/20">
                   <div class="w-2 h-2 rounded-full bg-white animate-pulse flex-shrink-0"></div>
@@ -1167,8 +1824,21 @@
               referrerpolicy="no-referrer-when-downgrade"
               allowfullscreen>
             </iframe>
-            <div class="absolute left-4 bottom-4 bg-white/92 backdrop-blur px-3 py-2 rounded-lg shadow text-xs text-gray-600 border border-gray-200 z-10">
-              公司登記址｜臺中市大里區長榮里大里路31之2之4號
+            <!-- 社群矩陣入口列 -->
+            <div class="flex items-center gap-3 px-4 pt-3 pb-4 border-t border-gray-200/80 bg-gray-100 rounded-b-2xl">
+              <a href="https://www.facebook.com/" target="_blank" rel="noreferrer" aria-label="Facebook" class="w-10 h-10 rounded-full text-white flex items-center justify-center shadow hover:opacity-80 transition-all flex-shrink-0" style="background:#7B96B2">
+                <i class="ph-fill ph-facebook-logo text-lg"></i>
+              </a>
+              <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" aria-label="Instagram" class="w-10 h-10 rounded-full text-white flex items-center justify-center shadow hover:opacity-80 transition-all flex-shrink-0" style="background:#C4856A">
+                <i class="ph-fill ph-instagram-logo text-lg"></i>
+              </a>
+              <a href="https://www.threads.net/" target="_blank" rel="noreferrer" aria-label="Threads" class="w-10 h-10 rounded-full text-white flex items-center justify-center shadow hover:opacity-80 transition-all flex-shrink-0" style="background:#6B6867">
+                <i class="ph-fill ph-threads-logo text-lg"></i>
+              </a>
+              <a href="https://www.youtube.com/" target="_blank" rel="noreferrer" aria-label="YouTube" class="w-10 h-10 rounded-full text-white flex items-center justify-center shadow hover:opacity-80 transition-all flex-shrink-0" style="background:#B85A5A">
+                <i class="ph-fill ph-youtube-logo text-lg"></i>
+              </a>
+              <span class="text-xs text-gray-400 ml-1">追蹤我們的社群</span>
             </div>
             <!-- ▌標示：社群地圖 -->
             <div id="ann-conv-map" class="annotation-wrapper absolute bottom-4 right-4 w-72 z-[160]">
@@ -1255,9 +1925,23 @@
               <p class="text-gray-600 leading-relaxed mb-4 max-w-md">
                 丹淳是提供網站設計與數位整合的專業團隊，從品牌定位、UI/UX 設計到技術上線，協助企業打造可持續成長的官網。
               </p>
-              <div class="flex flex-wrap gap-2 text-xs text-gray-500">
+              <div class="flex flex-wrap gap-2 text-xs text-gray-500 mb-5">
                 <span class="px-2.5 py-1 rounded-full bg-gray-100 border border-gray-200">全台遠端服務</span>
                 <span class="px-2.5 py-1 rounded-full bg-gray-100 border border-gray-200">企業網站顧問</span>
+              </div>
+              <div class="flex items-center gap-3">
+                <a href="https://www.facebook.com/" target="_blank" rel="noreferrer" aria-label="Facebook" class="w-10 h-10 rounded-full text-white flex items-center justify-center shadow-sm hover:opacity-80 transition-all" style="background:#7B96B2">
+                  <i class="ph-fill ph-facebook-logo text-xl"></i>
+                </a>
+                <a href="https://www.instagram.com/" target="_blank" rel="noreferrer" aria-label="Instagram" class="w-10 h-10 rounded-full text-white flex items-center justify-center shadow-sm hover:opacity-80 transition-all" style="background:#C4856A">
+                  <i class="ph-fill ph-instagram-logo text-xl"></i>
+                </a>
+                <a href="https://www.threads.net/" target="_blank" rel="noreferrer" aria-label="Threads" class="w-10 h-10 rounded-full text-white flex items-center justify-center shadow-sm hover:opacity-80 transition-all" style="background:#6B6867">
+                  <i class="ph-fill ph-threads-logo text-xl"></i>
+                </a>
+                <a href="https://www.youtube.com/" target="_blank" rel="noreferrer" aria-label="YouTube" class="w-10 h-10 rounded-full text-white flex items-center justify-center shadow-sm hover:opacity-80 transition-all" style="background:#B85A5A">
+                  <i class="ph-fill ph-youtube-logo text-xl"></i>
+                </a>
               </div>
             </div>
 
@@ -1275,7 +1959,6 @@
               <h4 class="font-bold text-nature-800 mb-3">聯絡我們</h4>
               <ul class="space-y-2 text-gray-600">
                 <li>0973591518</li>
-                <li>change280@gmail.com</li>
                 <li>臺中市大里區長榮里大里路31之2之4號</li>
                 <li class="pt-1 flex items-center gap-2 text-nature-600">
                   <i class="ph ph-clock"></i> Mon - Fri 09:00 - 18:00
@@ -1474,19 +2157,138 @@
       const previewBrowser = document.getElementById('preview-browser');
       const servicePanel   = document.getElementById('service-panel');
       const serviceCategories = servicePanel ? servicePanel.querySelectorAll('.service-category') : [];
+      const mobileFeatureTrigger = document.getElementById('mobile-feature-trigger');
+      const mobileFeatureSheet = document.getElementById('mobile-feature-sheet');
+      const mobileFeatureBackdrop = document.getElementById('mobile-feature-backdrop');
+      const mobileFeatureClose = document.getElementById('mobile-feature-close');
+      const mobileFeatureCurrent = document.getElementById('mobile-feature-current');
+      const mobileTapHintModal = document.getElementById('mobile-tap-hint-modal');
+      const mobileTapHintModalClose = document.getElementById('mobile-tap-hint-modal-close');
+      const mobileTapHintModalConfirm = document.getElementById('mobile-tap-hint-modal-confirm');
+            // 手機版首次進站指引彈窗
+            function showMobileTapHintModalIfNeeded() {
+              const isMobile = window.innerWidth <= 768 && !document.body.classList.contains('mobile-preview-mode');
+              if (!isMobile) return;
+              if (mobileTapHintModal) {
+                mobileTapHintModal.classList.remove('hidden');
+              }
+            }
+
+            function closeMobileTapHintModal() {
+              if (mobileTapHintModal) {
+                mobileTapHintModal.classList.add('hidden');
+              }
+            }
+
+            if (mobileTapHintModalClose) {
+              mobileTapHintModalClose.addEventListener('click', closeMobileTapHintModal);
+            }
+            if (mobileTapHintModalConfirm) {
+              mobileTapHintModalConfirm.addEventListener('click', closeMobileTapHintModal);
+            }
+
+            // 頁面載入時自動顯示
+            showMobileTapHintModalIfNeeded();
+      const mobileFeatureTabs = document.querySelectorAll('.mobile-feature-tab');
+      const mobileFeatureLists = document.querySelectorAll('.mobile-feature-list');
+      const mobileFeatureItems = document.querySelectorAll('.mobile-feature-item');
       const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
       const mobileMenuPanel = document.getElementById('mobile-menu-panel');
       const mockHeader = document.getElementById('mock-header');
+      const topControlBar = document.getElementById('top-control-bar');
       const stickyCtaContainer = document.getElementById('sticky-cta-container');
+      const floatingCtaWrap = document.getElementById('floating-cta-wrap');
+      const floatingCtaPhoneLink = document.getElementById('floating-cta-phone');
+      const floatingCtaFormButton = document.getElementById('floating-cta-form');
+      const phoneContactModal = document.getElementById('phone-contact-modal');
+      const phoneContactOverlay = document.getElementById('phone-contact-overlay');
+      const phoneContactClose = document.getElementById('phone-contact-close');
+      const phoneContactCopy = document.getElementById('phone-contact-copy');
+      const phoneContactFeedback = document.getElementById('phone-contact-feedback');
+      const PHONE_NUMBER = '0973591518';
+      const contactFormCard = document.getElementById('form-card');
+      const formNameInput = document.getElementById('form-name');
+      const annUiuxNav = document.getElementById('ann-uiux-nav');
       let isAllShowing     = false;
       let isMobilePreviewLocked = false;
       let stickyCtaRafId = null;
+      let headerRafId = null;
+      let lastHeaderScrollY = window.scrollY || 0;
+      let headerHideTimer = null;
+      const HEADER_AUTO_HIDE_DELAY = 1400;
       let serviceCloseTimer = null;
+      let navCloseTimer = null;
+      let isNavHoverBlockedByLang = false;
+      let activeMobileFeatureTarget = null;
+      const delayedFadeFeatureIds = new Set(['form-card', 'map-card']);
+      const ANNOTATION_SOFT_FADE_DURATION = 620;
+      const annotationFadeTimers = new Map();
+
+      // Defensive unlock: avoid sticky no-scroll state if a prior script error left this class on body.
+      document.body.classList.remove('overflow-hidden');
 
       function clearServiceCloseTimer() {
         if (!serviceCloseTimer) return;
         clearTimeout(serviceCloseTimer);
         serviceCloseTimer = null;
+      }
+
+      function clearNavCloseTimer() {
+        if (!navCloseTimer) return;
+        clearTimeout(navCloseTimer);
+        navCloseTimer = null;
+      }
+
+      function clearHeaderHideTimer() {
+        if (!headerHideTimer) return;
+        clearTimeout(headerHideTimer);
+        headerHideTimer = null;
+      }
+
+      function isRealMobileMode() {
+        return window.innerWidth <= 768 && !document.body.classList.contains('mobile-preview-mode');
+      }
+
+      function scheduleHeaderAutoHide() {
+        if (!mockHeader) return;
+        clearHeaderHideTimer();
+        headerHideTimer = setTimeout(() => {
+          if (!mockHeader || isHeaderInteractionActive()) return;
+          mockHeader.classList.add('header-hidden');
+        }, HEADER_AUTO_HIDE_DELAY);
+      }
+
+      function isHeaderInteractionActive() {
+        if (!mockHeader) return false;
+
+        const activeInteractiveHover = document.querySelector(
+          '#mock-header nav:hover, #mock-header button:hover, #mock-header #lang-switch:hover, #mock-header .dropdown-menu-1:hover, #mock-header .dropdown-menu-2:hover, #mobile-menu-panel:hover'
+        );
+
+        return Boolean(activeInteractiveHover) || mockHeader.contains(document.activeElement);
+      }
+
+      function revealHeaderAndScheduleHide(shouldSchedule = true) {
+        if (!mockHeader) return;
+        mockHeader.classList.remove('header-hidden');
+
+        if (shouldSchedule && !isHeaderInteractionActive() && document.body.classList.contains('header-scrolled')) {
+          scheduleHeaderAutoHide();
+        } else {
+          clearHeaderHideTimer();
+        }
+      }
+
+      function closeAllNavDropdowns() {
+        document.querySelectorAll('.nav-item.has-dropdown').forEach(nav => {
+          nav.classList.remove('expanded-menu');
+        });
+      }
+
+      function openNavDropdown(nav) {
+        clearNavCloseTimer();
+        closeAllNavDropdowns();
+        nav.classList.add('expanded-menu');
       }
 
       function closeAllServiceCategories() {
@@ -1504,6 +2306,159 @@
           category.classList.toggle('is-open', category === categoryToOpen);
         });
       }
+
+      function clearAnnotationFadeTimer(featureId) {
+        if (!annotationFadeTimers.has(featureId)) return;
+        const timers = annotationFadeTimers.get(featureId);
+        if (timers.startTimerId) {
+          clearTimeout(timers.startTimerId);
+        }
+        if (timers.finalizeTimerId) {
+          clearTimeout(timers.finalizeTimerId);
+        }
+        annotationFadeTimers.delete(featureId);
+      }
+
+      function scheduleAnnotationFade(featureId, delay = 800) {
+        if (!delayedFadeFeatureIds.has(featureId)) return;
+
+        const annotationId = featureToAnnotationMap[featureId];
+        const annEl = annotationId ? document.getElementById(annotationId) : null;
+        const featureEl = document.getElementById(featureId);
+        if (!annEl || !featureEl) return;
+
+        clearAnnotationFadeTimer(featureId);
+        const startTimerId = setTimeout(() => {
+          if (isAllShowing) {
+            annotationFadeTimers.delete(featureId);
+            return;
+          }
+          if (annEl.matches(':hover')) {
+            annotationFadeTimers.delete(featureId);
+            return;
+          }
+
+          annEl.classList.add('annotation-soft-fade');
+
+          const finalizeTimerId = setTimeout(() => {
+            annotationFadeTimers.delete(featureId);
+
+            if (isAllShowing) {
+              annEl.classList.remove('annotation-soft-fade');
+              return;
+            }
+            if (annEl.matches(':hover')) {
+              annEl.classList.remove('annotation-soft-fade');
+              return;
+            }
+
+            annEl.classList.remove('annotation-soft-fade');
+            annEl.classList.remove('annotation-active');
+            annEl.classList.add('annotation-dimmed');
+            featureEl.classList.remove('is-active');
+            featureEl.classList.add('is-dimmed');
+
+            enforceLangNavExclusion();
+          }, ANNOTATION_SOFT_FADE_DURATION);
+
+          annotationFadeTimers.set(featureId, { startTimerId: null, finalizeTimerId });
+        }, delay);
+
+        annotationFadeTimers.set(featureId, { startTimerId, finalizeTimerId: null });
+      }
+
+      function setMobileFeatureGroup(groupId) {
+        mobileFeatureTabs.forEach(tab => {
+          tab.classList.toggle('is-active', tab.dataset.mobileFeatureGroup === groupId);
+        });
+
+        mobileFeatureLists.forEach(list => {
+          list.classList.toggle('is-active', list.dataset.mobileFeatureList === groupId);
+        });
+      }
+
+      function openMobileFeatureSheet() {
+        if (!mobileFeatureSheet || !mobileFeatureTrigger) return;
+        mobileFeatureSheet.classList.remove('hidden');
+        mobileFeatureTrigger.setAttribute('aria-expanded', 'true');
+        if (mobileTapHint) {
+          mobileTapHint.classList.add('is-muted');
+        }
+      }
+
+      function closeMobileFeatureSheet() {
+        if (!mobileFeatureSheet || !mobileFeatureTrigger) return;
+        mobileFeatureSheet.classList.add('hidden');
+        mobileFeatureTrigger.setAttribute('aria-expanded', 'false');
+        if (mobileTapHint) {
+          mobileTapHint.classList.remove('is-muted');
+        }
+      }
+
+      function triggerDesktopSubItem(targetId, eventName) {
+        if (!targetId) return;
+        const desktopItem = Array.from(subItems).find(item => item.dataset.target === targetId);
+        if (!desktopItem) return;
+        desktopItem.dispatchEvent(new Event(eventName, { bubbles: true }));
+      }
+
+      if (mobileFeatureTrigger) {
+        mobileFeatureTrigger.addEventListener('click', () => {
+          if (!mobileFeatureSheet) return;
+          if (mobileFeatureSheet.classList.contains('hidden')) {
+            openMobileFeatureSheet();
+          } else {
+            closeMobileFeatureSheet();
+          }
+        });
+      }
+
+      if (mobileFeatureBackdrop) {
+        mobileFeatureBackdrop.addEventListener('click', () => {
+          closeMobileFeatureSheet();
+        });
+      }
+
+      if (mobileFeatureClose) {
+        mobileFeatureClose.addEventListener('click', () => {
+          closeMobileFeatureSheet();
+        });
+      }
+
+      mobileFeatureTabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+          setMobileFeatureGroup(tab.dataset.mobileFeatureGroup);
+        });
+      });
+
+      mobileFeatureItems.forEach(item => {
+        item.addEventListener('click', () => {
+          const targetId = item.dataset.target;
+          if (!targetId) return;
+
+          const isRealMobileMode = window.innerWidth <= 768 && !document.body.classList.contains('mobile-preview-mode');
+          if (isRealMobileMode && targetId === 'ann-uiux-rwd') {
+            return;
+          }
+
+          if (activeMobileFeatureTarget && activeMobileFeatureTarget !== targetId) {
+            triggerDesktopSubItem(activeMobileFeatureTarget, 'mouseleave');
+          }
+
+          triggerDesktopSubItem(targetId, 'mouseenter');
+          activeMobileFeatureTarget = targetId;
+
+          mobileFeatureItems.forEach(el => {
+            el.classList.toggle('is-active', el === item);
+          });
+
+          if (mobileFeatureCurrent) {
+            mobileFeatureCurrent.textContent = item.textContent.trim();
+          }
+
+          closeMobileFeatureSheet();
+        });
+      });
 
       if (servicePanel && serviceCategories.length) {
         servicePanel.addEventListener('mouseenter', () => {
@@ -1527,6 +2482,41 @@
             clearServiceCloseTimer();
             openServiceCategory(category);
           });
+        });
+      }
+
+      const navItems = document.querySelectorAll('.nav-item.has-dropdown');
+      navItems.forEach(nav => {
+        nav.addEventListener('mouseenter', () => {
+          openNavDropdown(nav);
+        });
+
+        nav.addEventListener('mouseleave', () => {
+          clearNavCloseTimer();
+          navCloseTimer = setTimeout(() => {
+            nav.classList.remove('expanded-menu');
+          }, 220);
+        });
+      });
+
+      const navHost = document.querySelector('#mock-header nav');
+      if (navHost) {
+        navHost.addEventListener('mouseenter', clearNavCloseTimer);
+        navHost.addEventListener('mouseleave', () => {
+          clearNavCloseTimer();
+          navCloseTimer = setTimeout(closeAllNavDropdowns, 220);
+        });
+      }
+
+      if (mockHeader) {
+        mockHeader.addEventListener('mouseenter', () => {
+          revealHeaderAndScheduleHide(!isHeaderInteractionActive());
+        });
+
+        mockHeader.addEventListener('mouseleave', () => {
+          if (document.body.classList.contains('header-scrolled')) {
+            scheduleHeaderAutoHide();
+          }
         });
       }
 
@@ -1554,6 +2544,115 @@
           if (!mockHeader.contains(event.target)) {
             setMobileMenuOpen(false);
           }
+        });
+      }
+
+      function scrollToContactFormFromCta() {
+        if (!contactFormCard) return;
+
+        const topOffset = 200;
+        const targetTop = contactFormCard.getBoundingClientRect().top + window.scrollY - topOffset;
+        window.scrollTo({ top: targetTop, behavior: 'smooth' });
+
+        if (formNameInput) {
+          setTimeout(() => {
+            formNameInput.focus({ preventScroll: true });
+            formNameInput.classList.remove('input-attention-flash');
+            // Force reflow so repeated clicks replay the animation.
+            void formNameInput.offsetWidth;
+            formNameInput.classList.add('input-attention-flash');
+
+            setTimeout(() => {
+              formNameInput.classList.remove('input-attention-flash');
+            }, 1050);
+          }, 460);
+        }
+      }
+
+      function isDesktopPhonePromptMode() {
+        return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      }
+
+      function setPhoneContactFeedback(message) {
+        if (!phoneContactFeedback) return;
+        phoneContactFeedback.textContent = message;
+      }
+
+      function openPhoneContactModal() {
+        if (!phoneContactModal) return;
+        phoneContactModal.classList.remove('hidden');
+        phoneContactModal.classList.add('flex');
+        document.body.classList.add('overflow-hidden');
+        setPhoneContactFeedback('');
+        if (phoneContactCopy) {
+          phoneContactCopy.focus({ preventScroll: true });
+        }
+      }
+
+      function closePhoneContactModal() {
+        if (!phoneContactModal) return;
+        phoneContactModal.classList.add('hidden');
+        phoneContactModal.classList.remove('flex');
+        document.body.classList.remove('overflow-hidden');
+        setPhoneContactFeedback('');
+      }
+
+      async function copyPhoneNumber() {
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) {
+            await navigator.clipboard.writeText(PHONE_NUMBER);
+          } else {
+            const fallbackInput = document.createElement('input');
+            fallbackInput.value = PHONE_NUMBER;
+            fallbackInput.setAttribute('readonly', 'true');
+            fallbackInput.style.position = 'absolute';
+            fallbackInput.style.left = '-9999px';
+            document.body.appendChild(fallbackInput);
+            fallbackInput.select();
+            document.execCommand('copy');
+            document.body.removeChild(fallbackInput);
+          }
+          setPhoneContactFeedback('電話號碼已複製');
+        } catch (error) {
+          setPhoneContactFeedback('複製失敗，請手動複製電話號碼');
+        }
+      }
+
+      if (floatingCtaPhoneLink) {
+        floatingCtaPhoneLink.addEventListener('click', (event) => {
+          if (!isDesktopPhonePromptMode()) return;
+          event.preventDefault();
+          openPhoneContactModal();
+        });
+      }
+
+      if (phoneContactOverlay) {
+        phoneContactOverlay.addEventListener('click', closePhoneContactModal);
+      }
+
+      if (phoneContactClose) {
+        phoneContactClose.addEventListener('click', closePhoneContactModal);
+      }
+
+      if (phoneContactCopy) {
+        phoneContactCopy.addEventListener('click', () => {
+          copyPhoneNumber();
+        });
+      }
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape' || !phoneContactModal || phoneContactModal.classList.contains('hidden')) return;
+        closePhoneContactModal();
+      });
+
+      document.addEventListener('keydown', (event) => {
+        if (event.key !== 'Escape') return;
+        closeMobileFeatureSheet();
+      });
+
+      if (floatingCtaFormButton) {
+        floatingCtaFormButton.addEventListener('click', () => {
+          scrollToContactFormFromCta();
         });
       }
 
@@ -1589,13 +2688,20 @@
       function positionStickyCta() {
         if (!previewBrowser || !stickyCtaContainer) return;
 
+        if (isRealMobileMode()) {
+          stickyCtaContainer.style.left = '';
+          stickyCtaContainer.style.top = '';
+          return;
+        }
+
         const previewRect = previewBrowser.getBoundingClientRect();
         const ctaRect = stickyCtaContainer.getBoundingClientRect();
         const ctaWidth = Math.max(64, ctaRect.width || 64);
         const ctaHeight = Math.max(64, ctaRect.height || 64);
         const isSmallScreen = window.innerWidth <= 768;
+        const isRealMobile = isSmallScreen && !document.body.classList.contains('mobile-preview-mode');
         const sideInset = isSmallScreen ? 10 : 18;
-        const bottomInset = isSmallScreen ? 18 : 26;
+        const bottomInset = isRealMobile ? 132 : (isSmallScreen ? 18 : 26);
 
         let left = previewRect.right - ctaWidth - sideInset;
         const minLeft = previewRect.left + 8;
@@ -1739,6 +2845,23 @@
         annEl.style.transform = 'none';
       }
 
+      function updateNavAnnotationPlacement() {
+        if (!annUiuxNav || !topControlBar) return;
+
+        annUiuxNav.classList.remove('nav-right-fallback');
+
+        const topBarRect = topControlBar.getBoundingClientRect();
+        const annRect = annUiuxNav.getBoundingClientRect();
+
+        const isOverlappingTopBar =
+          annRect.bottom > topBarRect.top &&
+          annRect.top < topBarRect.bottom;
+
+        if (isOverlappingTopBar) {
+          annUiuxNav.classList.add('nav-right-fallback');
+        }
+      }
+
       function setMobilePreviewMode(enabled) {
         if (previewBrowser) {
           previewBrowser.classList.toggle('mobile-sim', enabled);
@@ -1771,6 +2894,33 @@
         });
       }
 
+      function enforceLangNavExclusion() {
+        const langAnn = document.getElementById('ann-conv-lang');
+        if (!langAnn || !annUiuxNav) return;
+
+        const navFeatureId = annotationAnchorMap['ann-uiux-nav'];
+        const navFeatureEl = navFeatureId ? document.getElementById(navFeatureId) : null;
+        const isLangActive = langAnn.classList.contains('annotation-active');
+
+        if (isLangActive) {
+          isNavHoverBlockedByLang = true;
+          annUiuxNav.classList.remove('annotation-active');
+          annUiuxNav.classList.add('annotation-dimmed');
+          clearNavCloseTimer();
+          closeAllNavDropdowns();
+
+          if (navFeatureEl) {
+            navFeatureEl.classList.remove('is-active');
+            navFeatureEl.classList.add('is-dimmed');
+          }
+          return;
+        }
+
+        // 多語系註解框消失後，解除對智慧型置頂選單 hover 的封鎖
+        isNavHoverBlockedByLang = false;
+        // 多語系未顯示時，不主動改動智慧型置頂選單狀態，交回原本 hover 機制控制。
+      }
+
       function activateAnnotationByFeature(featureId) {
         const annotationId = featureToAnnotationMap[featureId];
         if (!annotationId || isAllShowing) return;
@@ -1779,10 +2929,17 @@
         const featureEl = document.getElementById(featureId);
         if (!annEl || !featureEl) return;
 
+        annEl.classList.remove('annotation-soft-fade');
         annEl.classList.remove('annotation-dimmed');
         annEl.classList.add('annotation-active');
         featureEl.classList.remove('is-dimmed');
         featureEl.classList.add('is-active');
+        clearAnnotationFadeTimer(featureId);
+        if (delayedFadeFeatureIds.has(featureId)) {
+          scheduleAnnotationFade(featureId);
+        }
+
+        enforceLangNavExclusion();
 
         if (document.body.classList.contains('mobile-preview-mode')) {
           requestAnimationFrame(() => {
@@ -1799,10 +2956,17 @@
         const featureEl = document.getElementById(featureId);
         if (!annEl || !featureEl) return;
 
+        if (delayedFadeFeatureIds.has(featureId)) {
+          scheduleAnnotationFade(featureId);
+          return;
+        }
+
         annEl.classList.remove('annotation-active');
         annEl.classList.add('annotation-dimmed');
         featureEl.classList.remove('is-active');
         featureEl.classList.add('is-dimmed');
+
+        enforceLangNavExclusion();
       }
 
       Object.keys(featureToAnnotationMap).forEach(featureId => {
@@ -1818,9 +2982,25 @@
         });
       });
 
+      delayedFadeFeatureIds.forEach(featureId => {
+        const annotationId = featureToAnnotationMap[featureId];
+        const annEl = annotationId ? document.getElementById(annotationId) : null;
+        if (!annEl) return;
+
+        annEl.addEventListener('mouseenter', () => {
+          clearAnnotationFadeTimer(featureId);
+          activateAnnotationByFeature(featureId);
+        });
+
+        annEl.addEventListener('mouseleave', () => {
+          scheduleAnnotationFade(featureId);
+        });
+      });
+
       /* ── 初始化：全部設為 dimmed ── */
       function resetToDimmed() {
         allAnnotations.forEach(ann => {
+          ann.classList.remove('annotation-soft-fade');
           ann.classList.remove('annotation-active');
           ann.classList.add('annotation-dimmed');
           
@@ -1861,6 +3041,7 @@
               allAnnotations.forEach(ann => positionAnnotationForMobile(ann.id));
             });
           }
+          enforceLangNavExclusion();
           toggleBtn.innerHTML = `<i class="ph ph-eye-slash text-lg"></i><span>恢復互動探索模式</span>`;
           toggleBtn.className = 'flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all btn-show-all';
         } else {
@@ -1869,6 +3050,7 @@
             clearMobileAnnotationInlineStyles();
           }
           document.querySelectorAll('[id^="card-"]').forEach(c => c.classList.remove('card-active'));
+          enforceLangNavExclusion();
           toggleBtn.innerHTML = `<i class="ph ph-eye text-lg"></i><span>強制顯示所有標示</span>`;
           toggleBtn.className = 'flex items-center gap-2 px-5 py-2.5 rounded-full font-medium transition-all bg-nature-50 border border-nature-200 text-nature-700 hover:bg-nature-100';
         }
@@ -1890,6 +3072,51 @@
           const targetEl = document.getElementById(targetId);
           if (!targetEl) return;
 
+          if (targetId === 'ann-uiux-nav') {
+            const langAnn = document.getElementById('ann-conv-lang');
+            const shouldBlockNavHover = isNavHoverBlockedByLang || (langAnn && langAnn.classList.contains('annotation-active'));
+            if (shouldBlockNavHover) {
+              enforceLangNavExclusion();
+              return;
+            }
+
+            const lockedScrollY = window.scrollY;
+
+            if (!isAllShowing) {
+              targetEl.classList.remove('annotation-dimmed');
+              targetEl.classList.add('annotation-active');
+
+              const featureId = annotationAnchorMap[targetId];
+              if (featureId) {
+                const featureEl = document.getElementById(featureId);
+                if (featureEl) {
+                  featureEl.classList.remove('is-dimmed');
+                  featureEl.classList.add('is-active');
+                }
+              }
+            }
+
+            requestAnimationFrame(() => {
+              if (Math.abs(window.scrollY - lockedScrollY) > 1) {
+                window.scrollTo({ top: lockedScrollY, behavior: 'auto' });
+              }
+            });
+
+            const cycleDuration = 800; // 每個菜單的完整周期：展開+保持+收回
+
+            navItems.forEach((nav, index) => {
+              const delay = index * cycleDuration;
+              setTimeout(() => {
+                nav.classList.add('expanded-menu');
+              }, delay);
+              setTimeout(() => {
+                nav.classList.remove('expanded-menu');
+              }, delay + 500);
+            });
+
+            return;
+          }
+
           // 平滑捲動至目標；依不同區塊使用更精準的落點
           if (targetId === 'ann-conv-cta') {
             // Sticky CTA 固定於視窗，不需要捲動到其 DOM 位置
@@ -1906,25 +3133,6 @@
           } else {
             targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
           }
-
-          // 特殊：如果 hover 「智慧型置頂選單」，一個一個接續展開再收回
-          if (targetId === 'ann-uiux-nav') {
-            const navItems = document.querySelectorAll('.nav-item.has-dropdown');
-            const cycleDuration = 800; // 每個菜單的完整周期：展開+保持+收回
-            
-            navItems.forEach((nav, index) => {
-              const delay = index * cycleDuration;
-              // 展開
-              setTimeout(() => {
-                nav.classList.add('expanded-menu');
-              }, delay);
-              // 收回
-              setTimeout(() => {
-                nav.classList.remove('expanded-menu');
-              }, delay + 500);
-            });
-          }
-
           // 特殊：如果 hover 「RWD 跨裝置完美適配」，切換成手機寬度預覽
           if (targetId === 'ann-uiux-rwd' && previewBrowser) {
             setMobilePreviewMode(true);
@@ -1952,6 +3160,8 @@
                 });
               }
             }
+
+            enforceLangNavExclusion();
           } else {
             // 技術卡片：高亮
             targetEl.classList.add('card-active');
@@ -1965,10 +3175,8 @@
 
           // 取消展開導航
           if (targetId === 'ann-uiux-nav') {
-            const navItems = document.querySelectorAll('.nav-item.has-dropdown');
-            navItems.forEach(nav => {
-              nav.classList.remove('expanded-menu');
-            });
+            clearNavCloseTimer();
+            closeAllNavDropdowns();
           }
 
           if (targetId === 'ann-uiux-rwd' && previewBrowser && !isMobilePreviewLocked) {
@@ -1989,6 +3197,8 @@
                   featureEl.classList.add('is-dimmed');
                 }
               }
+
+              enforceLangNavExclusion();
             }
           } else {
             targetEl.classList.remove('card-active');
@@ -1999,8 +3209,10 @@
       window.addEventListener('resize', () => {
         if (window.innerWidth >= 1024) {
           setMobileMenuOpen(false);
+          closeMobileFeatureSheet();
         }
         positionStickyCta();
+        updateNavAnnotationPlacement();
         if (!document.body.classList.contains('mobile-preview-mode')) return;
         document.querySelectorAll('.annotation-wrapper.annotation-active').forEach(ann => {
           positionAnnotationForMobile(ann.id);
@@ -2028,6 +3240,36 @@
           });
         }
 
+        if (!headerRafId) {
+          headerRafId = requestAnimationFrame(() => {
+            headerRafId = null;
+
+            if (!mockHeader) return;
+
+            const currentScrollY = window.scrollY || 0;
+
+            const heroBannerEl = document.getElementById('hero-banner');
+            const heroBottom = heroBannerEl ? (heroBannerEl.getBoundingClientRect().bottom + currentScrollY) : 0;
+            const pastHero = heroBannerEl ? currentScrollY > (heroBottom - 24) : currentScrollY > 48;
+            const scrolledDownEnough = currentScrollY > 48;
+
+            document.body.classList.toggle('header-scrolled', scrolledDownEnough);
+            mockHeader.classList.toggle('header-floating', scrolledDownEnough);
+
+            if (!pastHero) {
+              clearHeaderHideTimer();
+              revealHeaderAndScheduleHide(false);
+            } else if (scrolledDownEnough) {
+              revealHeaderAndScheduleHide(true);
+            } else {
+              revealHeaderAndScheduleHide(false);
+            }
+
+            lastHeaderScrollY = currentScrollY;
+            updateNavAnnotationPlacement();
+          });
+        }
+
         if (!document.body.classList.contains('mobile-preview-mode')) return;
         if (repositionRafId) return;
 
@@ -2038,6 +3280,19 @@
           });
         });
       }, { passive: true });
+
+      // 初始化 header 狀態，避免首次載入時位置不一致
+      if (mockHeader) {
+        const currentScrollY = window.scrollY || 0;
+        const scrolledDownEnough = currentScrollY > 48;
+        document.body.classList.toggle('header-scrolled', scrolledDownEnough);
+        mockHeader.classList.toggle('header-floating', scrolledDownEnough);
+        revealHeaderAndScheduleHide(false);
+      }
+
+      requestAnimationFrame(() => {
+        updateNavAnnotationPlacement();
+      });
     });
   </script>
 
