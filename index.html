@@ -573,6 +573,15 @@
        ══════════════════════════════════════════ */
     .annotation-wrapper { transition: all .35s ease; }
 
+
+    /* 強制隱藏：reCAPTCHA 安全認證徽章（含網站金鑰錯誤提示） */
+    .grecaptcha-badge {
+      display: none !important;
+      visibility: hidden !important;
+      opacity: 0 !important;
+      pointer-events: none !important;
+    }
+
     /* 導覽列說明框：預設在 Mock Header 上方，若被頂部控制列遮擋則切到右下方 */
     #ann-uiux-nav {
       top: auto;
@@ -1462,7 +1471,7 @@
         </button>
       </div>
       <!-- ▌標示：常駐 CTA -->
-      <div id="ann-conv-cta" class="annotation-wrapper hidden absolute bottom-0 right-full mr-8 w-72 z-50">
+      <div id="ann-conv-cta" class="annotation-wrapper absolute bottom-0 right-full mr-8 w-72 z-50">
         <div class="absolute -inset-2 rounded-full annotation-dash pointer-events-none border-2"></div>
         <div class="annotation-content ann-box relative p-4 rounded-xl shadow-2xl">
           <div class="flex items-center gap-2 mb-2 pb-2 border-b border-white/20">
