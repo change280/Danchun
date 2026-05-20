@@ -1054,6 +1054,17 @@
       width: 240px !important;
       z-index: 140 !important;
     }
+    body.mobile-preview-mode #ann-uiux-hover {
+      position: absolute !important;
+      top: calc(100% + 12px) !important;
+      left: 50% !important;
+      right: auto !important;
+      bottom: auto !important;
+      margin-left: 0 !important;
+      transform: translate(-50%, 0) !important;
+      width: min(86vw, 22rem) !important;
+      z-index: 150 !important;
+    }
     body.mobile-preview-mode .annotation-wrapper .annotation-dash {
       display: none !important;
     }
@@ -1160,7 +1171,16 @@
         padding-bottom: 14px;
       }
       #mock-header {
-        border-radius: 0 0 20px 20px;
+        position: sticky !important;
+        top: 0 !important;
+        z-index: 188;
+        border-radius: 0;
+        background: rgba(255,255,255,.92) !important;
+        backdrop-filter: blur(20px) saturate(160%);
+        -webkit-backdrop-filter: blur(20px) saturate(160%);
+        box-shadow: 0 4px 24px rgba(45,51,47,.10), inset 0 1px 0 rgba(255,255,255,.8);
+        border-bottom: 1px solid rgba(229,231,235,.85);
+        transform: none !important;
       }
       #hero-banner {
         min-height: 460px;
@@ -1181,6 +1201,22 @@
         min-height: 52px;
         padding-left: 24px;
         padding-right: 24px;
+      }
+      body:not(.mobile-preview-mode) #ann-uiux-hover {
+        top: calc(100% + 12px) !important;
+        left: 50% !important;
+        right: auto !important;
+        margin-left: 0 !important;
+        transform: translate(-50%, 0) !important;
+        width: min(86vw, 22rem) !important;
+      }
+      body:not(.mobile-preview-mode) #ann-conv-cta {
+        width: min(64vw, 16rem) !important;
+        right: calc(100% + 10px) !important;
+        margin-right: 0 !important;
+      }
+      body:not(.mobile-preview-mode) #ann-conv-cta .annotation-content {
+        padding: 0.75rem !important;
       }
       /* .service-category { display: none; }  // 移除隱藏，讓手機版顯示 */
       .sticky-cta-container { z-index: 120; }
@@ -1288,6 +1324,9 @@
     }
 
     @media (max-width: 420px) {
+      body.mobile-preview-mode #ann-conv-cta {
+        width: min(58vw, 14.5rem) !important;
+      }
       .mobile-feature-trigger {
         right: 84px;
       }
@@ -1447,6 +1486,9 @@
           <li class="sub-item flex items-center gap-2 cursor-pointer hover:text-white/80 hover:translate-x-1 transition-all" data-target="card-sec-cms">
             <div class="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0"></div>輕量級智能內容後台 (CMS)
           </li>
+          <li class="sub-item flex items-center gap-2 cursor-pointer hover:text-white/80 hover:translate-x-1 transition-all" data-target="card-sec-ssl">
+            <div class="w-1.5 h-1.5 rounded-full bg-white/40 flex-shrink-0"></div>SSL 全站安全加密憑證
+          </li>
         </ul>
       </div>
     </div>
@@ -1552,8 +1594,31 @@
         <div class="w-3 h-3 rounded-full bg-red-400"></div>
         <div class="w-3 h-3 rounded-full bg-yellow-400"></div>
         <div class="w-3 h-3 rounded-full bg-green-400"></div>
-        <div class="ml-4 bg-white px-4 py-1.5 rounded text-xs text-gray-400 font-mono flex-1 max-w-sm text-center border border-gray-200 shadow-sm">
-          danchun.com.tw
+        <div class="ml-4 bg-white px-4 py-1.5 rounded text-xs text-gray-400 font-mono flex-1 max-w-sm text-center border border-gray-200 shadow-sm flex items-center justify-center gap-1 relative group">
+          <span 
+            id="https-trigger"
+            class="text-red-500 font-bold cursor-pointer relative"
+            style="letter-spacing:0.04em;"
+            tabindex="0"
+          >
+            https://
+            <span id="ssl-tooltip-box" class="absolute left-1/2 -translate-x-1/2 top-full mt-2 w-[280px] opacity-0 pointer-events-none transition-opacity duration-200"
+              style="z-index:9999;">
+              <div class="annotation-content ann-box relative p-4 rounded-xl shadow-2xl text-white text-sm">
+                <div class="flex items-center gap-2 mb-3 pb-2 border-b border-white/20">
+                  <div class="w-2 h-2 rounded-full bg-white animate-pulse flex-shrink-0"></div>
+                  <span class="font-bold text-sm">SSL 全站安全加密</span>
+                </div>
+                <div class="flex flex-col gap-2">
+                  <div class="flex items-center gap-2"><i class="ph ph-lock-key text-base flex-shrink-0"></i><span>保護資料傳輸安全</span></div>
+                  <div class="flex items-center gap-2"><i class="ph ph-magnifying-glass text-base flex-shrink-0"></i><span class="font-bold">提升 Google 搜尋排名</span></div>
+                  <div class="flex items-center gap-2"><i class="ph ph-shield-check text-base flex-shrink-0"></i><span>增加瀏覽器信任度</span></div>
+                  <div class="flex items-center gap-2"><i class="ph ph-user text-base flex-shrink-0"></i><span>建立品牌專業形象</span></div>
+                </div>
+              </div>
+            </span>
+          </span>
+          <span class="select-none">danchun.com.tw</span>
         </div>
       </div>
 
@@ -1838,6 +1903,7 @@
         <p class="text-gray-600 text-sm leading-relaxed">針對「最新消息」或「作品案例」提供如 Notion 般直覺的無頭式後台，自動更新網頁且絕對不會破壞首頁排版。</p>
       </div>
 
+
     </div><!-- / grid -->
         
         <!-- ── Mock Bottom（表單 + 地圖） ── -->
@@ -2075,6 +2141,41 @@
        ═══════════════════════════════════════ -->
   <script>
     document.addEventListener('DOMContentLoaded', () => {
+            // SSL 全站安全加密憑證互動：觸發 https:// tooltip
+            const sslSubItem = document.querySelector('.sub-item[data-target="card-sec-ssl"]');
+            const sslTooltip = document.getElementById('ssl-tooltip-box');
+            let sslHideTimer = null;
+            const httpsTrigger = document.getElementById('https-trigger');
+            if (sslTooltip) {
+              function showSslTooltip() {
+                if (isMobilePreviewLocked) return;
+                window.scrollTo({ top: 0, behavior: 'smooth' });
+                if (sslHideTimer) { clearTimeout(sslHideTimer); sslHideTimer = null; }
+                sslTooltip.style.opacity = '1';
+                sslTooltip.style.pointerEvents = 'auto';
+              }
+              function hideSslTooltip(delay) {
+                sslHideTimer = setTimeout(() => {
+                  sslTooltip.style.opacity = '';
+                  sslTooltip.style.pointerEvents = '';
+                }, delay || 0);
+              }
+              // https:// 文字 hover
+              if (httpsTrigger) {
+                httpsTrigger.addEventListener('mouseenter', showSslTooltip);
+                httpsTrigger.addEventListener('mouseleave', () => hideSslTooltip(300));
+                httpsTrigger.addEventListener('click', () => { showSslTooltip(); hideSslTooltip(2000); });
+              }
+              // 右側服務列表子項目 hover / click
+              if (sslSubItem) {
+                sslSubItem.addEventListener('mouseenter', showSslTooltip);
+                sslSubItem.addEventListener('mouseleave', () => hideSslTooltip(200));
+                sslSubItem.addEventListener('click', () => { showSslTooltip(); hideSslTooltip(2000); });
+              }
+              // tooltip 本身 hover 時保持顯示
+              sslTooltip.addEventListener('mouseenter', () => { if (sslHideTimer) { clearTimeout(sslHideTimer); sslHideTimer = null; } });
+              sslTooltip.addEventListener('mouseleave', () => hideSslTooltip(200));
+            }
       const toggleBtn      = document.getElementById('toggleAnnotations');
 
       /* ── 聯絡表單 reCAPTCHA v3 + API 正式送出 ── */
@@ -2332,6 +2433,10 @@
 
       function isRealMobileMode() {
         return window.innerWidth <= 768 && !document.body.classList.contains('mobile-preview-mode');
+      }
+
+      function isMobileAnnotationMode() {
+        return window.innerWidth <= 768 || document.body.classList.contains('mobile-preview-mode');
       }
 
       function scheduleHeaderAutoHide() {
@@ -2753,6 +2858,29 @@
         });
       }
 
+      if (floatingCtaWrap) {
+        floatingCtaWrap.addEventListener('click', () => {
+          if (!isMobileAnnotationMode() || isAllShowing) return;
+
+          const ctaFeatureId = 'floating-cta-wrap';
+          const ctaAnnotationId = featureToAnnotationMap[ctaFeatureId];
+          const ctaAnnotationEl = ctaAnnotationId ? document.getElementById(ctaAnnotationId) : null;
+          if (!ctaAnnotationEl) return;
+
+          if (ctaAnnotationEl.classList.contains('annotation-active')) {
+            deactivateAnnotationByFeature(ctaFeatureId);
+          } else {
+            activateAnnotationByFeature(ctaFeatureId);
+          }
+        });
+      }
+
+      document.addEventListener('click', (event) => {
+        if (!isMobileAnnotationMode() || isAllShowing || !floatingCtaWrap) return;
+        if (floatingCtaWrap.contains(event.target)) return;
+        deactivateAnnotationByFeature('floating-cta-wrap');
+      });
+
       const annotationAnchorMap = {
         // 注意：ann-uiux-rwd 已從此映射中移除，保持其浮動徽章的原始位置
         // 'ann-uiux-rwd': 'hero-banner',
@@ -2769,7 +2897,7 @@
       );
 
       // 不需要動態定位的注解框（保持原始樣式）
-      const excludeFromMobileReposition = ['ann-uiux-rwd'];
+      const excludeFromMobileReposition = ['ann-uiux-rwd', 'ann-uiux-hover'];
 
       function clearMobileAnnotationInlineStyles() {
         allAnnotations.forEach(ann => {
@@ -3021,6 +3149,7 @@
       function activateAnnotationByFeature(featureId) {
         const annotationId = featureToAnnotationMap[featureId];
         if (!annotationId || isAllShowing) return;
+        if (isMobilePreviewLocked) return;
 
         const annEl = document.getElementById(annotationId);
         const featureEl = document.getElementById(featureId);
@@ -3071,10 +3200,12 @@
         if (!featureEl) return;
 
         featureEl.addEventListener('mouseenter', () => {
+          if (featureId === 'floating-cta-wrap' && isMobileAnnotationMode()) return;
           activateAnnotationByFeature(featureId);
         });
 
         featureEl.addEventListener('mouseleave', () => {
+          if (featureId === 'floating-cta-wrap' && isMobileAnnotationMode()) return;
           deactivateAnnotationByFeature(featureId);
         });
       });
@@ -3163,6 +3294,23 @@
           collapseServicePanelOnMobileSubItemClick();
 
           const targetId = item.dataset.target;
+          if (!targetId) return;
+
+          // 手機模式：子選單點擊也要有反應
+          // 例外：ann-conv-cta 仍維持「僅點虛線匡內才觸發」
+          if (isMobileAnnotationMode()) {
+            if (targetId === 'ann-uiux-rwd' && previewBrowser) {
+              isMobilePreviewLocked = !isMobilePreviewLocked;
+              setMobilePreviewMode(isMobilePreviewLocked);
+              return;
+            }
+
+            if (targetId !== 'ann-conv-cta') {
+              item.dispatchEvent(new Event('mouseenter'));
+            }
+            return;
+          }
+
           if (targetId !== 'ann-uiux-rwd' || !previewBrowser) return;
 
           // 點擊切換：桌機 <-> 手機預覽（持續狀態）
@@ -3171,6 +3319,7 @@
         });
 
         item.addEventListener('mouseenter', () => {
+          if (isMobilePreviewLocked) return;
           const targetId = item.dataset.target;
           const targetEl = document.getElementById(targetId);
           if (!targetEl) return;
@@ -3226,11 +3375,11 @@
           } else if (targetId === 'ann-conv-map') {
             const mapCard = document.getElementById('map-card');
             const anchorEl = mapCard || targetEl;
-            const topOffset = 120;
+            const topOffset = 200;
             const targetTop = anchorEl.getBoundingClientRect().top + window.scrollY - topOffset;
             window.scrollTo({ top: targetTop, behavior: 'smooth' });
           } else if (targetId === 'ann-conv-form') {
-            const topOffset = 160;
+            const topOffset = isMobileAnnotationMode() ? 400 : 600;
             const targetTop = targetEl.getBoundingClientRect().top + window.scrollY - topOffset;
             window.scrollTo({ top: targetTop, behavior: 'smooth' });
           } else {
@@ -3388,8 +3537,9 @@
       if (mockHeader) {
         const currentScrollY = window.scrollY || 0;
         const scrolledDownEnough = currentScrollY > 48;
+        const isMobileReal = window.innerWidth <= 768 && !document.body.classList.contains('mobile-preview-mode');
         document.body.classList.toggle('header-scrolled', scrolledDownEnough);
-        mockHeader.classList.toggle('header-floating', scrolledDownEnough);
+        mockHeader.classList.toggle('header-floating', scrolledDownEnough || isMobileReal);
         revealHeaderAndScheduleHide(false);
       }
 
