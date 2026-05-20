@@ -49,14 +49,14 @@
   <script>
   // 手機版懸浮服務列表 X 關閉鍵功能
   document.addEventListener('DOMContentLoaded', function () {
-    function isMobile() {
-      return window.innerWidth <= 1023 && !document.body.classList.contains('mobile-preview-mode');
+    function isMobileServiceMode() {
+      return window.innerWidth <= 1023 || document.body.classList.contains('mobile-preview-mode');
     }
     function updateCloseBtnVisibility() {
       document.querySelectorAll('.service-category').forEach(function (cat) {
         var closeBtn = cat.querySelector('.close-category-btn');
         if (!closeBtn) return;
-        if (isMobile() && cat.classList.contains('is-open')) {
+        if (isMobileServiceMode() && cat.classList.contains('is-open')) {
           closeBtn.classList.remove('hidden');
         } else {
           closeBtn.classList.add('hidden');
@@ -86,12 +86,13 @@
     // 手機版：點擊任何子項目自動收合服務選單
     document.querySelectorAll('.service-category .sub-item').forEach(function (item) {
       item.addEventListener('click', function (e) {
-        if (isMobile()) {
-          // 只關閉當前父 service-category，並同步 panel 狀態
-          var cat = item.closest('.service-category');
+        if (isMobileServiceMode()) {
+          // 手機模式：點擊任何子項目後，整組服務列表回到初始收合狀態
           var panel = document.getElementById('service-panel');
-          if (cat) cat.classList.remove('is-open');
-          // 若沒有任何 is-open，移除 has-open-category
+          document.querySelectorAll('.service-category.is-open').forEach(function (openCat) {
+            openCat.classList.remove('is-open');
+          });
+          if (panel) panel.classList.remove('has-open-category');
           setTimeout(function() {
             var stillOpen = panel && panel.querySelector('.service-category.is-open');
             if (!stillOpen && panel) panel.classList.remove('has-open-category');
@@ -104,17 +105,42 @@
     });
     // 監聽展開/收合時同步顯示 X
     document.querySelectorAll('.service-category').forEach(function (cat) {
+        var catHead = cat.firstElementChild;
+
+        if (catHead) {
+          catHead.addEventListener('click', function (e) {
+            if (!isMobileServiceMode()) return;
+            if (e.target.closest('.close-category-btn')) return;
+
+            var panel = document.getElementById('service-panel');
+            var wasOpen = cat.classList.contains('is-open');
+
+            document.querySelectorAll('.service-category.is-open').forEach(function (openCat) {
+              openCat.classList.remove('is-open');
+            });
+
+            if (wasOpen) {
+              if (panel) panel.classList.remove('has-open-category');
+            } else {
+              cat.classList.add('is-open');
+              if (panel) panel.classList.add('has-open-category');
+            }
+
+            updateCloseBtnVisibility();
+          });
+        }
+
         cat.addEventListener('transitionend', updateCloseBtnVisibility);
         cat.addEventListener('mouseenter', function(e) {
           updateCloseBtnVisibility();
           // Prevent desktop hover/focus logic on mobile
-          if (isMobile()) return;
+          if (isMobileServiceMode()) return;
           // Desktop hover logic (if any) can go here
         });
         cat.addEventListener('mouseleave', updateCloseBtnVisibility);
         cat.addEventListener('focusin', function(e) {
           // Prevent desktop focus logic on mobile
-          if (isMobile()) return;
+          if (isMobileServiceMode()) return;
           // Desktop focus logic (if any) can go here
         });
     });
@@ -486,7 +512,6 @@
       width: 17.5rem;
       max-height: 600px;
     }
-    .service-category:hover,
     .service-category.is-open {
       width: 17.5rem;
       max-height: 600px;
@@ -494,12 +519,27 @@
       color: white;
       border-color: #9E4F48;
     }
+    @media (hover: hover) and (pointer: fine) {
+      .service-category:hover {
+        width: 17.5rem;
+        max-height: 600px;
+        background-color: #9E4F48;
+        color: white;
+        border-color: #9E4F48;
+      }
+    }
     .cat-icon-box { transition: all .5s ease; }
-    .service-category:hover .cat-icon-box,
     .service-category.is-open .cat-icon-box {
       background-color: #fff;
       color: #9E4F48;
       transform: rotate(360deg);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .service-category:hover .cat-icon-box {
+        background-color: #fff;
+        color: #9E4F48;
+        transform: rotate(360deg);
+      }
     }
 
     /* 子選單 */
@@ -509,11 +549,17 @@
       transition: opacity .35s ease, transform .35s ease;
       transition-delay: 0s;
     }
-    .service-category:hover .sub-menu,
     .service-category.is-open .sub-menu {
       opacity: 1;
       transform: translateY(0);
       transition-delay: .18s;
+    }
+    @media (hover: hover) and (pointer: fine) {
+      .service-category:hover .sub-menu {
+        opacity: 1;
+        transform: translateY(0);
+        transition-delay: .18s;
+      }
     }
     #service-panel.has-open-category .service-category:not(.is-open) .sub-menu {
       opacity: 0;
@@ -2337,6 +2383,14 @@
         });
       }
 
+      function collapseServicePanelOnMobileSubItemClick() {
+        const isMobileServiceMode = window.innerWidth <= 1023 || document.body.classList.contains('mobile-preview-mode');
+        if (!isMobileServiceMode) return;
+
+        closeAllServiceCategories();
+        serviceCategories.forEach(category => category.blur && category.blur());
+      }
+
       function clearAnnotationFadeTimer(featureId) {
         if (!annotationFadeTimers.has(featureId)) return;
         const timers = annotationFadeTimers.get(featureId);
@@ -3092,7 +3146,13 @@
 
       /* ── 子項目 hover：捲動 + 啟動對應標示或高亮卡片 ── */
       subItems.forEach(item => {
+        item.addEventListener('pointerup', () => {
+          collapseServicePanelOnMobileSubItemClick();
+        });
+
         item.addEventListener('click', () => {
+          collapseServicePanelOnMobileSubItemClick();
+
           const targetId = item.dataset.target;
           if (targetId !== 'ann-uiux-rwd' || !previewBrowser) return;
 
