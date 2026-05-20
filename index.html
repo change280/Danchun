@@ -1224,6 +1224,7 @@
         width: min(64vw, 16rem) !important;
         right: calc(100% + 10px) !important;
         margin-right: 0 !important;
+        pointer-events: none !important;
       }
       body:not(.mobile-preview-mode) #ann-conv-cta .annotation-content {
         padding: 0.75rem !important;
@@ -2884,8 +2885,18 @@
       }
 
       if (floatingCtaWrap) {
-        floatingCtaWrap.addEventListener('click', () => {
+        floatingCtaWrap.addEventListener('click', (event) => {
           if (!isMobileAnnotationMode() || isAllShowing) return;
+
+          const wrapRect = floatingCtaWrap.getBoundingClientRect();
+          const clickInsideWrapBox =
+            event.clientX >= wrapRect.left &&
+            event.clientX <= wrapRect.right &&
+            event.clientY >= wrapRect.top &&
+            event.clientY <= wrapRect.bottom;
+
+          // ann-conv-cta 雖為子節點但位於左側外部，不應觸發 CTA 說明框切換
+          if (!clickInsideWrapBox) return;
 
           const ctaFeatureId = 'floating-cta-wrap';
           const ctaAnnotationId = featureToAnnotationMap[ctaFeatureId];
