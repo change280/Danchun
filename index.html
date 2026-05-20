@@ -335,7 +335,7 @@
       top: 112px;
       z-index: 560;
       transition: transform .68s cubic-bezier(.175,.885,.32,1.28), top .45s ease, box-shadow .45s ease, opacity .45s ease, background-color .45s ease, border-color .45s ease, padding .45s ease, border-radius .45s ease;
-      will-change: transform;
+      will-change: auto;
       transform-origin: top center;
     }
     #mock-header.header-floating {
@@ -771,18 +771,43 @@
       color: #9E4F48;
       box-shadow: 0 14px 28px rgba(194,123,114,0.18);
     }
+    .mobile-menu-panel-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 620;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      padding: 14px;
+    }
+    .mobile-menu-backdrop {
+      position: absolute;
+      inset: 0;
+      background: rgba(45, 51, 47, 0.46);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+    }
     .mobile-menu-surface {
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,248,0.96));
-      border: 1px solid rgba(213, 220, 214, 0.85);
-      box-shadow: 0 26px 48px rgba(45, 51, 47, 0.14);
+      position: relative;
+      width: min(100%, 430px);
+      max-height: calc(100vh - 28px);
+      overflow-y: auto;
+      background:
+        linear-gradient(180deg, rgba(247,246,241,.55), rgba(247,246,241,.58)),
+        url('hamburger模擬.png') center / cover no-repeat;
+      background-blend-mode: normal;
+      border: 1px solid rgba(216, 218, 208, 0.96);
+      border-radius: 34px;
+      box-shadow: 0 28px 56px rgba(38, 48, 42, 0.2), inset 0 1px 0 rgba(255,255,255,0.85);
       backdrop-filter: blur(16px);
+      padding-bottom: 22px;
     }
     .mobile-menu-section {
-      border: 1px solid rgba(213, 220, 214, 0.75);
-      background: rgba(255,255,255,0.78);
-      border-radius: 20px;
-      padding: 16px;
-      box-shadow: inset 0 1px 0 rgba(255,255,255,0.7);
+      border: 1px solid rgba(223, 225, 217, 0.82);
+      background: rgba(255,255,255,0.72);
+      border-radius: 22px;
+      padding: 14px;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.76);
     }
     .mobile-menu-link {
       display: flex;
@@ -822,6 +847,125 @@
     .mobile-menu-panel-enter {
       animation: mobileMenuEnter .26s ease-out;
       transform-origin: top right;
+    }
+    .mobile-menu-dual {
+      display: grid;
+      grid-template-columns: minmax(0, .84fr) minmax(0, 1.36fr);
+      gap: 10px;
+      align-items: start;
+    }
+    .mobile-menu-sub-list {
+      display: flex;
+      flex-direction: column;
+      gap: 10px;
+    }
+    .mobile-menu-sub-link {
+      display: flex;
+      align-items: center;
+      gap: 0;
+      width: 100%;
+      min-width: 0;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid rgba(224, 227, 219, 0.86);
+      background: rgba(255,255,255,0.7);
+      color: #536456;
+      text-align: left;
+      font-size: clamp(.72rem, 2.7vw, .82rem);
+      font-weight: 600;
+      letter-spacing: 0;
+      transition: all .2s ease;
+    }
+    .mobile-menu-sub-link:hover {
+      transform: translateY(-1px);
+      border-color: rgba(194,123,114,.45);
+      color: #395345;
+      background: rgba(255,255,255,0.9);
+    }
+    .mobile-menu-sub-link i {
+      display: none;
+    }
+    .mobile-menu-sub-link span {
+      display: block;
+      width: 100%;
+      min-width: 0;
+      white-space: nowrap;
+      overflow: visible;
+      text-overflow: clip;
+    }
+    .mobile-menu-main-item {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px;
+      width: 100%;
+      text-align: left;
+      padding: 12px 12px;
+      border-radius: 20px;
+      border: 1.5px solid rgba(214, 220, 212, 0.9);
+      background: rgba(255,255,255,0.74);
+      color: #365041;
+      box-shadow: 0 8px 18px rgba(62, 74, 64, 0.08);
+      overflow: hidden;
+      transition: all .2s ease;
+    }
+    .mobile-menu-main-item:hover,
+    .mobile-menu-main-item.is-active {
+      border-color: rgba(194, 123, 114, 0.66);
+      background: rgba(255, 251, 249, 0.94);
+      color: #8E4A44;
+      box-shadow: 0 12px 20px rgba(194,123,114,.15);
+    }
+    .mobile-menu-main-icon {
+      width: 52px;
+      height: 52px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(180deg, #a5af9f, #8e9a88);
+      color: #f7f6f1;
+      flex-shrink: 0;
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.24), 0 6px 14px rgba(69,84,73,.2);
+    }
+    .mobile-menu-main-item.is-active .mobile-menu-main-icon {
+      background: linear-gradient(180deg, #d9a99f, #c58578);
+      box-shadow: inset 0 1px 0 rgba(255,255,255,.24), 0 6px 14px rgba(194,123,114,.24);
+    }
+    .mobile-menu-main-icon i {
+      font-size: 1.3rem;
+    }
+    .mobile-menu-main-copy {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: flex-start;
+      gap: 4px;
+      min-width: 0;
+    }
+    .mobile-menu-main-item .zh {
+      font-size: clamp(1.05rem, 3.8vw, 1.5rem);
+      line-height: 1.08;
+      font-family: "Noto Serif TC", serif;
+      font-weight: 700;
+      letter-spacing: .045em;
+      white-space: nowrap;
+      max-width: 100%;
+      overflow: visible;
+      text-overflow: clip;
+    }
+    .mobile-menu-main-item .en {
+      font-size: .56rem;
+      letter-spacing: .14em;
+      text-transform: uppercase;
+      opacity: .6;
+      font-weight: 700;
+      white-space: nowrap;
+    }
+    .mobile-menu-main-arrow {
+      color: #6c7d70;
+      font-size: 1.25rem;
+      flex-shrink: 0;
     }
 
     /* ── Mobile Feature Navigator：手機版重點導覽 ── */
@@ -1030,8 +1174,8 @@
     body.mobile-preview-mode #mock-header #mobile-menu-toggle {
       display: flex !important;
     }
-    body.mobile-preview-mode #mock-header #mobile-menu-panel:not(.hidden) {
-      display: block !important;
+    body.mobile-preview-mode #mobile-menu-panel:not(.hidden) {
+      display: flex !important;
     }
 
     /* ── 手機版優化：實機與 RWD 模擬皆適用 ── */
@@ -1745,49 +1889,88 @@
             </div>
 
             <!-- Mobile Menu -->
-            <div id="mobile-menu-panel" class="lg:hidden hidden absolute top-full left-4 right-4 mt-4 z-[560]">
-              <div class="mobile-menu-surface mobile-menu-panel-enter rounded-[28px] p-4 sm:p-5 text-sm text-gray-700 overflow-hidden">
-                <div class="flex items-center justify-between gap-4 px-2 pb-4 mb-4 border-b border-nature-100">
+            <div id="mobile-menu-panel" class="mobile-menu-panel-overlay hidden" role="dialog" aria-modal="true" aria-labelledby="mobile-menu-title">
+              <button id="mobile-menu-backdrop" type="button" class="mobile-menu-backdrop" aria-label="關閉選單背景"></button>
+              <div class="mobile-menu-surface mobile-menu-panel-enter rounded-[28px] p-4 sm:p-5 text-sm text-gray-700">
+                <div class="flex items-start justify-between gap-4 px-2 pb-4 mb-4 border-b border-nature-100">
                   <div>
                     <p class="text-[11px] tracking-[0.24em] uppercase text-nature-500">Mobile Navigation</p>
-                    <p class="text-lg font-bold text-nature-800 mt-1">快速瀏覽丹淳網站架構</p>
+                    <p id="mobile-menu-title" class="text-lg font-bold text-nature-800 mt-1">快速瀏覽丹淳網站架構</p>
                   </div>
-                  <div class="w-12 h-12 rounded-2xl bg-nature-50 text-nature-600 flex items-center justify-center border border-nature-100 shadow-sm">
-                    <i class="ph ph-squares-four text-2xl"></i>
-                  </div>
+                  <button id="mobile-menu-close" type="button" class="w-12 h-12 rounded-2xl border border-gray-200 bg-white text-gray-500 flex items-center justify-center shadow-sm hover:bg-gray-50 transition-colors" aria-label="關閉選單">
+                    <i class="ph ph-x text-2xl"></i>
+                  </button>
                 </div>
 
-                <div class="space-y-3">
-                  <section class="mobile-menu-section">
-                    <div class="flex items-center justify-between mb-3">
-                      <h3 class="font-bold text-lg text-nature-800">關於我們</h3>
-                      <span class="text-[11px] tracking-[0.18em] uppercase text-nature-400">About</span>
+                <div class="mobile-menu-dual">
+                  <div id="mobile-menu-sub" class="space-y-3">
+                    <div class="flex items-center justify-between">
+                      <button id="mobile-menu-back" type="button" class="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-500 hover:bg-gray-50 transition-colors">
+                        <i class="ph ph-caret-left"></i>
+                        清除
+                      </button>
+                      <span id="mobile-menu-subtitle" class="text-xs tracking-[0.18em] uppercase text-nature-400">選擇右側主選單</span>
                     </div>
-                    <div class="grid grid-cols-2 gap-2.5 text-sm">
-                      <a href="#" class="mobile-menu-link"><span>公司簡介</span><i class="ph  text-base"></i></a>
-                      <a href="#" class="mobile-menu-link"><span>服務理念</span><i class="ph  text-base"></i></a>
-                      <a href="#" class="mobile-menu-link"><span>團隊介紹</span><i class="ph  text-base"></i></a>
-                      <a href="#" class="mobile-menu-link"><span>合作流程</span><i class="ph  text-base"></i></a>
-                    </div>
-                  </section>
 
-                  <section class="mobile-menu-section">
-                    <div class="flex items-center justify-between mb-3">
-                      <h3 class="font-bold text-lg text-nature-800">網站設計方案</h3>
-                      <span class="text-[11px] tracking-[0.18em] uppercase text-nature-400">Services</span>
-                    </div>
-                    <div class="grid grid-cols-2 gap-2.5 text-sm">
-                      <a href="#" class="mobile-menu-link"><span>形象官網設計</span><i class="ph  text-base"></i></a>
-                      <a href="#" class="mobile-menu-link"><span>品牌網站改版</span><i class="ph  text-base"></i></a>
-                      <a href="#" class="mobile-menu-link"><span>一頁式轉換頁</span><i class="ph  text-base"></i></a>
-                      <a href="#" class="mobile-menu-link"><span>RWD 響應式網站</span><i class="ph  text-base"></i></a>
-                    </div>
-                  </section>
+                    <section data-submenu-group="about" class="mobile-menu-section hidden">
+                      <div class="mobile-menu-sub-list text-sm">
+                        <button type="button" class="mobile-menu-sub-link"><i class="ph ph-buildings"></i><span>公司簡介</span></button>
+                        <button type="button" class="mobile-menu-sub-link"><i class="ph ph-leaf"></i><span>服務理念</span></button>
+                        <button type="button" class="mobile-menu-sub-link"><i class="ph ph-users-three"></i><span>團隊介紹</span></button>
+                        <button type="button" class="mobile-menu-sub-link"><i class="ph ph-handshake"></i><span>合作流程</span></button>
+                        <button type="button" class="mobile-menu-sub-link"><i class="ph ph-newspaper"></i><span>媒體報導</span></button>
+                      </div>
+                    </section>
 
-                  <div class="flex flex-wrap gap-2 pt-1">
-                    <a href="#" class="mobile-menu-pill">最新消息</a>
-                    <a href="#" class="mobile-menu-pill">聯絡我們</a>
-                    <a href="#" class="mobile-menu-pill">專案諮詢</a>
+                    <section data-submenu-group="products" class="mobile-menu-section hidden">
+                    <div class="mobile-menu-sub-list text-sm">
+                      <button type="button" class="mobile-menu-sub-link"><i class="ph ph-layout"></i><span>網站設計方案</span></button>
+                      <button type="button" class="mobile-menu-sub-link"><i class="ph ph-circles-three-plus"></i><span>數位整合服務</span></button>
+                      <button type="button" class="mobile-menu-sub-link"><i class="ph ph-code"></i><span>企業客製開發</span></button>
+                      <button type="button" class="mobile-menu-sub-link"><i class="ph ph-plugs-connected"></i><span>跨部門系統串接</span></button>
+                    </div>
+                    </section>
+
+                    <section data-submenu-group="news" class="mobile-menu-section hidden">
+                    <div class="mobile-menu-sub-list text-sm">
+                      <button type="button" class="mobile-menu-sub-link"><i class="ph ph-briefcase"></i><span>案例更新</span></button>
+                      <button type="button" class="mobile-menu-sub-link"><i class="ph ph-terminal-window"></i><span>技術分享</span></button>
+                      <button type="button" class="mobile-menu-sub-link"><i class="ph ph-chart-line-up"></i><span>產業觀點</span></button>
+                      <button type="button" class="mobile-menu-sub-link"><i class="ph ph-notebook"></i><span>團隊專欄</span></button>
+                    </div>
+                    </section>
+
+                    <section data-submenu-group="contact" class="mobile-menu-section hidden">
+                    <div class="mobile-menu-sub-list text-sm">
+                      <button type="button" class="mobile-menu-sub-link"><i class="ph ph-headset"></i><span>聯絡客服</span></button>
+                      <button type="button" class="mobile-menu-sub-link"><i class="ph ph-calendar-check"></i><span>專案諮詢預約</span></button>
+                      <button type="button" class="mobile-menu-sub-link"><i class="ph ph-handshake"></i><span>合作洽談</span></button>
+                      <button type="button" class="mobile-menu-sub-link"><i class="ph ph-question"></i><span>常見問題</span></button>
+                    </div>
+                    </section>
+                  </div>
+
+                  <div id="mobile-menu-main" class="space-y-2.5">
+                    <button type="button" data-menu-group="about" class="mobile-menu-main-item">
+                    <span class="mobile-menu-main-icon"><i class="ph ph-sprout"></i></span>
+                    <span class="mobile-menu-main-copy"><span class="zh">關於我們</span><span class="en">about</span></span>
+                    <i class="ph ph-caret-right mobile-menu-main-arrow"></i>
+                    </button>
+                    <button type="button" data-menu-group="products" class="mobile-menu-main-item">
+                    <span class="mobile-menu-main-icon"><i class="ph ph-jar"></i></span>
+                    <span class="mobile-menu-main-copy"><span class="zh">產品系列</span><span class="en">services</span></span>
+                    <i class="ph ph-caret-right mobile-menu-main-arrow"></i>
+                    </button>
+                    <button type="button" data-menu-group="news" class="mobile-menu-main-item">
+                    <span class="mobile-menu-main-icon"><i class="ph ph-newspaper-clipping"></i></span>
+                    <span class="mobile-menu-main-copy"><span class="zh">最新消息</span><span class="en">news</span></span>
+                    <i class="ph ph-caret-right mobile-menu-main-arrow"></i>
+                    </button>
+                    <button type="button" data-menu-group="contact" class="mobile-menu-main-item">
+                    <span class="mobile-menu-main-icon"><i class="ph ph-envelope-simple-open"></i></span>
+                    <span class="mobile-menu-main-copy"><span class="zh">聯絡我們</span><span class="en">contact</span></span>
+                    <i class="ph ph-caret-right mobile-menu-main-arrow"></i>
+                    </button>
                   </div>
                 </div>
               </div>
@@ -2391,6 +2574,14 @@
       const mobileFeatureItems = document.querySelectorAll('.mobile-feature-item');
       const mobileMenuToggle = document.getElementById('mobile-menu-toggle');
       const mobileMenuPanel = document.getElementById('mobile-menu-panel');
+      const mobileMenuBackdrop = document.getElementById('mobile-menu-backdrop');
+      const mobileMenuClose = document.getElementById('mobile-menu-close');
+      const mobileMenuMain = document.getElementById('mobile-menu-main');
+      const mobileMenuSub = document.getElementById('mobile-menu-sub');
+      const mobileMenuBack = document.getElementById('mobile-menu-back');
+      const mobileMenuSubtitle = document.getElementById('mobile-menu-subtitle');
+      const mobileMenuMainButtons = mobileMenuPanel ? mobileMenuPanel.querySelectorAll('[data-menu-group]') : [];
+      const mobileMenuSubSections = mobileMenuPanel ? mobileMenuPanel.querySelectorAll('[data-submenu-group]') : [];
       const mockHeader = document.getElementById('mock-header');
       const topControlBar = document.getElementById('top-control-bar');
       const stickyCtaContainer = document.getElementById('sticky-cta-container');
@@ -2420,6 +2611,11 @@
       const delayedFadeFeatureIds = new Set(['form-card', 'map-card']);
       const ANNOTATION_SOFT_FADE_DURATION = 620;
       const annotationFadeTimers = new Map();
+
+      // Mobile menu overlay 必須脫離 mock-header，才能以 viewport 為基準全頁顯示。
+      if (mobileMenuPanel && mobileMenuPanel.parentElement !== document.body) {
+        document.body.appendChild(mobileMenuPanel);
+      }
 
       // Defensive unlock: avoid sticky no-scroll state if a prior script error left this class on body.
       document.body.classList.remove('overflow-hidden');
@@ -2753,10 +2949,46 @@
         mobileMenuPanel.classList.toggle('hidden', !isOpen);
         mobileMenuToggle.setAttribute('aria-expanded', isOpen ? 'true' : 'false');
         mobileMenuToggle.classList.toggle('is-open', isOpen);
+        document.body.classList.toggle('overflow-hidden', isOpen);
 
         const iconEl = mobileMenuToggle.querySelector('i');
         if (iconEl) {
           iconEl.className = isOpen ? 'ph ph-x text-2xl' : 'ph ph-list text-2xl';
+        }
+
+        if (isOpen) {
+          showMobileSubmenu('about');
+        }
+      }
+
+      function showMobileMenuMain() {
+        if (!mobileMenuMain || !mobileMenuSub) return;
+        mobileMenuSubSections.forEach(section => section.classList.add('hidden'));
+        mobileMenuMainButtons.forEach(button => button.classList.remove('is-active'));
+        if (mobileMenuSubtitle) {
+          mobileMenuSubtitle.textContent = '選擇右側主選單';
+        }
+      }
+
+      function showMobileSubmenu(group) {
+        if (!mobileMenuMain || !mobileMenuSub || !group) return;
+
+        mobileMenuSubSections.forEach(section => {
+          section.classList.toggle('hidden', section.dataset.submenuGroup !== group);
+        });
+
+        mobileMenuMainButtons.forEach(button => {
+          button.classList.toggle('is-active', button.dataset.menuGroup === group);
+        });
+
+        if (mobileMenuSubtitle) {
+          const titleMap = {
+            about: 'About',
+            products: 'Services',
+            news: 'News',
+            contact: 'Contact'
+          };
+          mobileMenuSubtitle.textContent = titleMap[group] || 'Menu';
         }
       }
 
@@ -2767,11 +2999,35 @@
           setMobileMenuOpen(shouldOpen);
         });
 
-        document.addEventListener('click', (event) => {
-          if (!mockHeader || !mobileMenuPanel || mobileMenuPanel.classList.contains('hidden')) return;
-          if (!mockHeader.contains(event.target)) {
-            setMobileMenuOpen(false);
-          }
+        const mobileMenuSubLinks = mobileMenuPanel.querySelectorAll('[data-submenu-group] .mobile-menu-sub-link');
+        mobileMenuSubLinks.forEach(link => {
+          link.addEventListener('click', () => {
+            // 次選單保留在同畫面，不進行換頁或自動關閉。
+          });
+        });
+
+        mobileMenuMainButtons.forEach(button => {
+          button.addEventListener('click', () => {
+            showMobileSubmenu(button.dataset.menuGroup);
+          });
+        });
+      }
+
+      if (mobileMenuBack) {
+        mobileMenuBack.addEventListener('click', () => {
+          showMobileMenuMain();
+        });
+      }
+
+      if (mobileMenuBackdrop) {
+        mobileMenuBackdrop.addEventListener('click', () => {
+          setMobileMenuOpen(false);
+        });
+      }
+
+      if (mobileMenuClose) {
+        mobileMenuClose.addEventListener('click', () => {
+          setMobileMenuOpen(false);
         });
       }
 
@@ -2875,6 +3131,7 @@
 
       document.addEventListener('keydown', (event) => {
         if (event.key !== 'Escape') return;
+        setMobileMenuOpen(false);
         closeMobileFeatureSheet();
       });
 
@@ -3233,7 +3490,8 @@
         }
       }
 
-      function deactivateAnnotationByFeature(featureId) {
+      function deactivateAnnotationByFeature(featureId, options = {}) {
+        const immediate = Boolean(options.immediate);
         const annotationId = featureToAnnotationMap[featureId];
         if (!annotationId || isAllShowing) return;
 
@@ -3241,7 +3499,7 @@
         const featureEl = document.getElementById(featureId);
         if (!annEl || !featureEl) return;
 
-        if (delayedFadeFeatureIds.has(featureId)) {
+        if (delayedFadeFeatureIds.has(featureId) && !immediate) {
           scheduleAnnotationFade(featureId);
           return;
         }
@@ -3281,6 +3539,24 @@
 
         annEl.addEventListener('mouseleave', () => {
           scheduleAnnotationFade(featureId);
+        });
+      });
+
+      // 手機模式：點擊紅色說明框可直接收合
+      allAnnotations.forEach(ann => {
+        ann.addEventListener('click', (event) => {
+          if (!isMobileAnnotationMode() || isAllShowing) return;
+
+          const clickTarget = event.target instanceof Element ? event.target : null;
+          const clickedAnnBox = clickTarget ? clickTarget.closest('.annotation-content') : null;
+          if (!clickedAnnBox) return;
+          if (!ann.classList.contains('annotation-active')) return;
+
+          const featureId = annotationAnchorMap[ann.id];
+          if (!featureId) return;
+
+          deactivateAnnotationByFeature(featureId, { immediate: true });
+          event.stopPropagation();
         });
       });
 
@@ -3356,11 +3632,21 @@
           if (!targetId) return;
 
           // 手機模式：子選單點擊也要有反應
-          // 例外：ann-conv-cta 仍維持「僅點虛線匡內才觸發」
           if (isMobileAnnotationMode()) {
             if (targetId === 'ann-uiux-rwd' && previewBrowser) {
               isMobilePreviewLocked = !isMobilePreviewLocked;
               setMobilePreviewMode(isMobilePreviewLocked);
+              return;
+            }
+
+            // 若目前是「RWD 跨裝置完美適配」鎖定狀態，
+            // 點擊其他子項目時先回到桌機版，再顯示對應說明框。
+            if (isMobilePreviewLocked && previewBrowser) {
+              isMobilePreviewLocked = false;
+              setMobilePreviewMode(false);
+              requestAnimationFrame(() => {
+                item.dispatchEvent(new Event('mouseenter'));
+              });
               return;
             }
 
