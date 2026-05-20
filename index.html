@@ -600,6 +600,16 @@
       transform: none;
       width: min(24rem, calc(100vw - 40px));
     }
+    @media (max-width: 768px) {
+      body:not(.mobile-preview-mode) #ann-uiux-nav {
+        top: calc(100% + 8px) !important;
+        bottom: auto !important;
+        left: 50% !important;
+        right: auto !important;
+        transform: translateX(-50%) !important;
+        width: min(92vw, 24rem) !important;
+      }
+    }
 
     /* Dimmed（預設）：內容隱藏，虛線框淡化 */
     .annotation-dimmed .annotation-content {
@@ -1072,7 +1082,7 @@
     @media (max-width: 768px) {
       html,
       body {
-        overflow-x: hidden;
+        overflow-x: clip !important;
       }
 
       .mobile-feature-hub {
@@ -1104,7 +1114,7 @@
         z-index: 183;
       }
       body:not(.mobile-preview-mode) #mock-header {
-        top: 0;
+        top: 12px;
         z-index: 188;
       }
       body:not(.mobile-preview-mode).header-scrolled #mock-header {
@@ -1115,7 +1125,7 @@
       }
       @media (max-width: 768px) {
         body:not(.mobile-preview-mode).header-scrolled #mock-header {
-          top: 16px;
+          top: 24px;
           transform: scale(.965);
           padding-top: .85rem;
           padding-bottom: .85rem;
@@ -1172,7 +1182,7 @@
       }
       #mock-header {
         position: sticky !important;
-        top: 0 !important;
+        top: 12px !important;
         z-index: 188;
         border-radius: 0;
         background: rgba(255,255,255,.92) !important;
@@ -1359,7 +1369,7 @@
   </style>
 </head>
 
-<body class="bg-nature-50 text-gray-800 font-sans pb-24 overflow-x-hidden">
+<body class="bg-nature-50 text-gray-800 font-sans pb-24">
 
 
   <!-- ═══════════════════════════════════════════════════
@@ -2443,6 +2453,7 @@
         if (!mockHeader) return;
         clearHeaderHideTimer();
         headerHideTimer = setTimeout(() => {
+          if (annUiuxNav && annUiuxNav.classList.contains('annotation-active')) return;
           if (!mockHeader || isHeaderInteractionActive()) return;
           mockHeader.classList.add('header-hidden');
         }, HEADER_AUTO_HIDE_DELAY);
@@ -2713,6 +2724,20 @@
       if (mockHeader) {
         mockHeader.addEventListener('mouseenter', () => {
           revealHeaderAndScheduleHide(!isHeaderInteractionActive());
+        });
+
+        mockHeader.addEventListener('click', (event) => {
+          if (isAllShowing || isMobilePreviewLocked) return;
+
+          const clickTarget = event.target instanceof Element ? event.target : null;
+          const clickedInteractiveArea = clickTarget ? clickTarget.closest(
+            '#lang-switch, #lang-switch-btn, #mobile-menu-toggle, #mobile-menu-panel, button, a'
+          ) : null;
+          if (clickedInteractiveArea) return;
+
+          revealHeaderAndScheduleHide(false);
+          activateAnnotationByFeature('mock-header', { forceNavFromHeaderClick: true });
+          updateNavAnnotationPlacement();
         });
 
         mockHeader.addEventListener('mouseleave', () => {
@@ -3073,6 +3098,12 @@
       function updateNavAnnotationPlacement() {
         if (!annUiuxNav || !topControlBar) return;
 
+        const isRealMobileMode = window.innerWidth <= 768 && !document.body.classList.contains('mobile-preview-mode');
+        if (isRealMobileMode) {
+          annUiuxNav.classList.remove('nav-right-fallback');
+          return;
+        }
+
         annUiuxNav.classList.remove('nav-right-fallback');
 
         const topBarRect = topControlBar.getBoundingClientRect();
@@ -3146,7 +3177,8 @@
         // 多語系未顯示時，不主動改動智慧型置頂選單狀態，交回原本 hover 機制控制。
       }
 
-      function activateAnnotationByFeature(featureId) {
+      function activateAnnotationByFeature(featureId, options = {}) {
+        const forceNavFromHeaderClick = Boolean(options.forceNavFromHeaderClick);
         const annotationId = featureToAnnotationMap[featureId];
         if (!annotationId || isAllShowing) return;
         if (isMobilePreviewLocked) return;
@@ -3163,6 +3195,22 @@
         clearAnnotationFadeTimer(featureId);
         if (delayedFadeFeatureIds.has(featureId)) {
           scheduleAnnotationFade(featureId);
+        }
+
+        if (forceNavFromHeaderClick && featureId === 'mock-header') {
+          const langAnn = document.getElementById('ann-conv-lang');
+          const langFeatureEl = document.getElementById('lang-switch-btn');
+
+          if (langAnn) {
+            langAnn.classList.remove('annotation-active');
+            langAnn.classList.add('annotation-dimmed');
+          }
+          if (langFeatureEl) {
+            langFeatureEl.classList.remove('is-active');
+            langFeatureEl.classList.add('is-dimmed');
+          }
+
+          isNavHoverBlockedByLang = false;
         }
 
         enforceLangNavExclusion();
@@ -3326,10 +3374,19 @@
 
           if (targetId === 'ann-uiux-nav') {
             const langAnn = document.getElementById('ann-conv-lang');
+            const langFeatureEl = document.getElementById('lang-switch-btn');
             const shouldBlockNavHover = isNavHoverBlockedByLang || (langAnn && langAnn.classList.contains('annotation-active'));
             if (shouldBlockNavHover) {
-              enforceLangNavExclusion();
-              return;
+              // 使用者主動選擇「智慧型置頂選單」時，應由導覽框接管顯示
+              if (langAnn) {
+                langAnn.classList.remove('annotation-active');
+                langAnn.classList.add('annotation-dimmed');
+              }
+              if (langFeatureEl) {
+                langFeatureEl.classList.remove('is-active');
+                langFeatureEl.classList.add('is-dimmed');
+              }
+              isNavHoverBlockedByLang = false;
             }
 
             const lockedScrollY = window.scrollY;
