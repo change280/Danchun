@@ -289,6 +289,10 @@
       position: relative;
       z-index: 1;
     }
+    /* 讓 SSL 提示框所在的瀏覽器標題列層級高於 mock header */
+    #preview-browser > .bg-gray-100 {
+      z-index: 620;
+    }
 
     /* ── 浮動動畫 ── */
     .float-anim { animation: floating 4s ease-in-out infinite; }
@@ -677,6 +681,56 @@
       pointer-events: none;
     }
 
+    /* RWD 子項目 hover 提示：獨立浮動，不併入選單內容 */
+    .rwd-floating-tip {
+      position: fixed;
+      z-index: 260;
+      padding: .58rem .78rem;
+      border-radius: 12px;
+      border: 1px solid rgba(194,123,114,.35);
+      background: rgba(255,255,255,.98);
+      color: #8f4f48;
+      font-size: .78rem;
+      font-weight: 700;
+      letter-spacing: .02em;
+      line-height: 1.35;
+      box-shadow: 0 12px 26px rgba(45,51,47,.18);
+      pointer-events: none;
+      white-space: nowrap;
+      opacity: 0;
+      transform: translateY(6px) scale(.98);
+      transition: opacity .2s ease, transform .2s ease;
+    }
+    .rwd-floating-tip::after {
+      content: '';
+      position: absolute;
+      right: -7px;
+      top: 50%;
+      width: 12px;
+      height: 12px;
+      transform: translateY(-50%) rotate(45deg);
+      background: rgba(255,255,255,.98);
+      border-top: 1px solid rgba(194,123,114,.35);
+      border-right: 1px solid rgba(194,123,114,.35);
+    }
+    .rwd-floating-tip.is-right::after {
+      right: auto;
+      left: -7px;
+      border-top: none;
+      border-right: none;
+      border-bottom: 1px solid rgba(194,123,114,.35);
+      border-left: 1px solid rgba(194,123,114,.35);
+    }
+    .rwd-floating-tip.is-visible {
+      opacity: 1;
+      transform: translateY(0) scale(1);
+    }
+    /* 避免 hover 位移造成命中區飄移，導致提示只在特定方向出現 */
+    .sub-item[data-target="ann-uiux-rwd"]:hover,
+    .sub-item[data-target="ann-uiux-rwd"]:focus-visible {
+      transform: none !important;
+    }
+
     /* ══════════════════════════════════════════
        標示匡 dimmed / active 狀態系統
        ══════════════════════════════════════════ */
@@ -823,6 +877,36 @@
       box-shadow: 0 14px 36px rgba(0,0,0,.1), 0 0 0 3px #C27B72 !important;
       border-color: #C27B72 !important;
       transition: all .3s cubic-bezier(.175,.885,.32,1.275);
+    }
+    @media (max-width: 1023px) {
+      #tech-grid [id^="card-"].card-active {
+        position: relative;
+        isolation: isolate;
+      }
+      #tech-grid [id^="card-"].card-active::before {
+        content: '';
+        position: absolute;
+        inset: -8px;
+        border: 2px dashed #C27B72;
+        border-radius: 20px;
+        pointer-events: none;
+        animation: pulseBorder 2s infinite;
+        z-index: 2;
+      }
+    }
+    body.mobile-preview-mode #tech-grid [id^="card-"].card-active {
+      position: relative;
+      isolation: isolate;
+    }
+    body.mobile-preview-mode #tech-grid [id^="card-"].card-active::before {
+      content: '';
+      position: absolute;
+      inset: -8px;
+      border: 2px dashed #C27B72;
+      border-radius: 20px;
+      pointer-events: none;
+      animation: pulseBorder 2s infinite;
+      z-index: 2;
     }
     @media (hover: hover) and (pointer: fine) {
       #tech-grid [id^="card-"]:hover {
@@ -1649,7 +1733,7 @@
       position: absolute;
       top: -1px;
       right: 24px;
-      z-index: 1210;
+      z-index: 52;
       display: inline-flex;
       align-items: center;
       gap: .45rem;
@@ -1690,7 +1774,7 @@
       border: 2px dashed #C27B72;
       border-radius: 18px;
       pointer-events: none;
-      z-index: 1200;
+      z-index: 50;
       opacity: 0;
       transition: opacity .35s ease;
       animation: pulseBorder 2s infinite;
@@ -2134,7 +2218,7 @@
   <!-- ═══════════════════════════════════════════════════
        右側懸浮服務列表（4 大類，accordion 展開 + 子選單）
        ═══════════════════════════════════════════════════ -->
-  <div id="service-panel" class="fixed right-0 top-[16%] z-[120] flex flex-col gap-3 pointer-events-none select-none">
+  <div id="service-panel" class="fixed right-0 top-[16%] z-[120] flex flex-col gap-3 pointer-events-auto select-none">
 
     <!-- ① 介面設計與體驗 -->
     <div class="service-category bg-white text-morandi-700 rounded-l-2xl shadow-xl border border-morandi-200 border-r-0 pointer-events-auto">
@@ -3208,6 +3292,7 @@
       const mobileMenuSubtitle = document.getElementById('mobile-menu-subtitle');
       const mobileMenuMainButtons = mobileMenuPanel ? mobileMenuPanel.querySelectorAll('[data-menu-group]') : [];
       const mobileMenuSubSections = mobileMenuPanel ? mobileMenuPanel.querySelectorAll('[data-submenu-group]') : [];
+      const rwdMenuItem = document.querySelector('.sub-item[data-target="ann-uiux-rwd"]');
       const backToDesktopBtn = document.getElementById('back-to-desktop-btn');
       const mockHeader = document.getElementById('mock-header');
       const topControlBar = document.getElementById('top-control-bar');
@@ -3242,6 +3327,67 @@
       const delayedFadeFeatureIds = new Set(['form-card', 'map-card']);
       const ANNOTATION_SOFT_FADE_DURATION = 620;
       const annotationFadeTimers = new Map();
+      const hasHoverPointer = window.matchMedia('(hover: hover) and (pointer: fine)').matches;
+      let rwdFloatingTip = null;
+
+      function ensureRwdFloatingTip() {
+        if (rwdFloatingTip) return rwdFloatingTip;
+        const tip = document.createElement('div');
+        tip.className = 'rwd-floating-tip';
+        tip.textContent = '點擊檢視完整手機最適化版本';
+        document.body.appendChild(tip);
+        rwdFloatingTip = tip;
+        return tip;
+      }
+
+      function hideRwdFloatingTip() {
+        if (!rwdFloatingTip) return;
+        rwdFloatingTip.classList.remove('is-visible', 'is-right');
+      }
+
+      function showRwdFloatingTip() {
+        if (!rwdMenuItem || !hasHoverPointer) return;
+        const tip = ensureRwdFloatingTip();
+        tip.classList.remove('is-right', 'is-visible');
+
+        // 先顯示但保持透明，讓我們取得正確寬高後再定位。
+        tip.style.visibility = 'hidden';
+        tip.style.opacity = '0';
+        tip.style.left = '0px';
+        tip.style.top = '0px';
+        tip.classList.add('is-visible');
+
+        const itemRect = rwdMenuItem.getBoundingClientRect();
+        const tipRect = tip.getBoundingClientRect();
+        const gap = 14;
+        const viewportPadding = 10;
+
+        let left = itemRect.left - tipRect.width - gap;
+        let placeRight = false;
+
+        if (left < viewportPadding) {
+          left = itemRect.right + gap;
+          placeRight = true;
+        }
+
+        if (left + tipRect.width > window.innerWidth - viewportPadding) {
+          left = window.innerWidth - tipRect.width - viewportPadding;
+        }
+
+        let top = itemRect.top + (itemRect.height - tipRect.height) / 2;
+        if (top < viewportPadding) {
+          top = viewportPadding;
+        }
+        if (top + tipRect.height > window.innerHeight - viewportPadding) {
+          top = window.innerHeight - tipRect.height - viewportPadding;
+        }
+
+        tip.style.left = `${Math.round(left)}px`;
+        tip.style.top = `${Math.round(top)}px`;
+        tip.style.visibility = '';
+        tip.style.opacity = '';
+        tip.classList.toggle('is-right', placeRight);
+      }
 
       // Mobile menu overlay 必須脫離 mock-header，才能以 viewport 為基準全頁顯示。
       if (mobileMenuPanel && mobileMenuPanel.parentElement !== document.body) {
@@ -3257,6 +3403,16 @@
         serviceCloseTimer = null;
       }
 
+      if (rwdMenuItem && hasHoverPointer) {
+        rwdMenuItem.addEventListener('mouseenter', showRwdFloatingTip);
+        rwdMenuItem.addEventListener('mouseleave', hideRwdFloatingTip);
+        rwdMenuItem.addEventListener('focusin', showRwdFloatingTip);
+        rwdMenuItem.addEventListener('focusout', hideRwdFloatingTip);
+
+        window.addEventListener('scroll', hideRwdFloatingTip, { passive: true });
+        window.addEventListener('resize', hideRwdFloatingTip);
+      }
+
       function clearNavCloseTimer() {
         if (!navCloseTimer) return;
         clearTimeout(navCloseTimer);
@@ -3270,11 +3426,11 @@
       }
 
       function isRealMobileMode() {
-        return window.innerWidth <= 768 && !document.body.classList.contains('mobile-preview-mode');
+        return window.innerWidth <= 1023 && !document.body.classList.contains('mobile-preview-mode');
       }
 
       function isMobileAnnotationMode() {
-        return window.innerWidth <= 768 || document.body.classList.contains('mobile-preview-mode');
+        return window.innerWidth <= 1023 || document.body.classList.contains('mobile-preview-mode');
       }
 
       function scheduleHeaderAutoHide() {
@@ -3506,7 +3662,7 @@
           clearServiceCloseTimer();
           serviceCloseTimer = setTimeout(() => {
             closeAllServiceCategories();
-          }, 180);
+          }, 280);
         });
 
         serviceCategories.forEach(category => {
@@ -4311,17 +4467,32 @@
           collapseServicePanelOnMobileSubItemClick();
         });
 
-        item.addEventListener('click', () => {
+        item.addEventListener('click', (event) => {
           collapseServicePanelOnMobileSubItemClick();
 
           const targetId = item.dataset.target;
           if (!targetId) return;
+          const targetEl = document.getElementById(targetId);
 
           // 手機模式：子選單點擊也要有反應
           if (isMobileAnnotationMode()) {
             if (targetId === 'ann-uiux-rwd' && previewBrowser) {
+              window.scrollTo({ top: 0, behavior: 'smooth' });
               isMobilePreviewLocked = !isMobilePreviewLocked;
               setMobilePreviewMode(isMobilePreviewLocked);
+              return;
+            }
+
+            // 手機模式：技術/資安卡片點擊後維持紅匡高亮
+            if (targetId.startsWith('card-') && targetEl) {
+              if (isMobilePreviewLocked && previewBrowser) {
+                isMobilePreviewLocked = false;
+                setMobilePreviewMode(false);
+              }
+              event.stopPropagation();
+              clearTechCardActiveState();
+              targetEl.classList.add('card-active');
+              targetEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
               return;
             }
 
@@ -4343,6 +4514,8 @@
           }
 
           if (targetId !== 'ann-uiux-rwd' || !previewBrowser) return;
+
+          window.scrollTo({ top: 0, behavior: 'smooth' });
 
           // 點擊切換：桌機 <-> 手機預覽（持續狀態）
           isMobilePreviewLocked = !isMobilePreviewLocked;
@@ -4465,6 +4638,11 @@
           const targetEl = document.getElementById(targetId);
           if (!targetEl) return;
 
+          // 手機模式的卡片高亮採點擊鎖定，不因子項目滑出而清除
+          if (isMobileAnnotationMode() && targetId.startsWith('card-')) {
+            return;
+          }
+
           // 取消展開導航
           if (targetId === 'ann-uiux-nav') {
             clearNavCloseTimer();
@@ -4519,6 +4697,7 @@
         if (!isMobileAnnotationMode()) return;
         const clickTarget = event.target instanceof Element ? event.target : null;
         if (!clickTarget) return;
+        if (clickTarget.closest('#service-panel .sub-item[data-target^="card-"]')) return;
         if (clickTarget.closest('#tech-grid [id^="card-"]')) return;
         clearTechCardActiveState();
       });
