@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>丹淳 Danchun 官網提案 - 視覺引導版</title>
+  <title>單純 Danchun 官網提案 - 視覺引導版</title>
 
   <!-- Tailwind CSS CDN -->
   <script src="https://cdn.tailwindcss.com"></script>
@@ -173,12 +173,121 @@
         pointer-events: auto !important;
       }
     }
-    body { scroll-behavior: smooth; }
+    body {
+      scroll-behavior: smooth;
+      background:
+        radial-gradient(circle at 12% 8%, rgba(209, 221, 212, 0.72), transparent 28%),
+        radial-gradient(circle at 85% 14%, rgba(234, 220, 206, 0.58), transparent 26%),
+        radial-gradient(circle at 78% 76%, rgba(198, 174, 146, 0.16), transparent 22%),
+        linear-gradient(180deg, #f4f1ea 0%, #f7f5ef 38%, #eef2ec 100%);
+      color: #2d332f;
+    }
 
     /* ── Glass panel ── */
     .glass-panel {
-      background: rgba(255, 255, 255, 0.88);
-      backdrop-filter: blur(14px);
+      background: linear-gradient(135deg, rgba(255, 255, 255, 0.76), rgba(246, 243, 236, 0.54));
+      border: 1px solid rgba(255, 255, 255, 0.55);
+      box-shadow: 0 18px 38px rgba(88, 97, 87, 0.08), inset 0 1px 0 rgba(255,255,255,0.72);
+      backdrop-filter: blur(20px) saturate(135%);
+      -webkit-backdrop-filter: blur(20px) saturate(135%);
+    }
+
+    #top-control-bar h1 {
+      letter-spacing: .08em;
+      text-shadow: 0 1px 0 rgba(255,255,255,.55);
+    }
+    #top-control-bar p {
+      letter-spacing: .03em;
+    }
+    #preview-browser h2,
+    #preview-browser h3,
+    #preview-browser h4 {
+      text-wrap: balance;
+    }
+    #preview-browser .max-w-5xl h2,
+    #preview-browser section.max-w-5xl h2 {
+      letter-spacing: .08em;
+      line-height: 1.24;
+      font-family: "Noto Serif TC", serif;
+      font-weight: 700;
+      color: #2f3c33;
+    }
+    #tech-grid h3,
+    #form-card h3,
+    #map-card + * h3,
+    .cta-panel h3,
+    footer h4 {
+      letter-spacing: .075em;
+      line-height: 1.34;
+      font-family: "Noto Serif TC", serif;
+      color: #334338;
+    }
+    #tech-grid p,
+    #form-card p,
+    #map-card p,
+    .cta-panel p,
+    footer li,
+    footer p {
+      letter-spacing: .025em;
+      line-height: 1.8;
+    }
+    #preview-browser button,
+    #preview-browser a[role="button"],
+    #preview-browser .cta-actions button,
+    #toggleAnnotations,
+    #form-submit,
+    #phone-contact-copy,
+    #phone-contact-modal a[href^="tel:"] {
+      letter-spacing: .12em;
+      font-weight: 700;
+    }
+    #preview-browser .cta-actions button,
+    #hero-cta-btn,
+    #toggleAnnotations,
+    #form-submit {
+      transition: transform .24s ease, box-shadow .24s ease, background-color .24s ease, border-color .24s ease, color .24s ease;
+    }
+    #preview-browser .cta-actions button:hover,
+    #hero-cta-btn:hover,
+    #toggleAnnotations:hover,
+    #form-submit:hover {
+      transform: translateY(-1px);
+    }
+
+    #preview-browser {
+      background: linear-gradient(180deg, rgba(255,255,255,0.95), rgba(248, 246, 240, 0.92));
+      border-color: rgba(214, 219, 210, 0.92);
+      box-shadow: 0 30px 65px rgba(72, 83, 72, 0.16), 0 8px 28px rgba(185, 165, 139, 0.08);
+      isolation: isolate;
+    }
+    #preview-browser::before,
+    #preview-browser::after {
+      content: '';
+      position: absolute;
+      inset: auto;
+      pointer-events: none;
+      z-index: 0;
+      opacity: .72;
+      filter: blur(2px);
+    }
+    #preview-browser::before {
+      left: -10%;
+      right: -10%;
+      bottom: 8%;
+      height: 180px;
+      background: linear-gradient(180deg, rgba(255,255,255,0), rgba(227, 233, 225, 0.46));
+      clip-path: ellipse(62% 70% at 50% 100%);
+    }
+    #preview-browser::after {
+      right: -12%;
+      bottom: 3%;
+      width: 320px;
+      height: 320px;
+      background: radial-gradient(circle, rgba(199, 208, 194, 0.2) 0%, rgba(199, 208, 194, 0.08) 42%, transparent 72%);
+    }
+    #preview-browser > * {
+      position: relative;
+      z-index: 1;
     }
 
     /* ── 浮動動畫 ── */
@@ -649,9 +758,11 @@
 
     /* ── 莫蘭迪紅標示匡背景 ── */
     .ann-box {
-      background: rgba(194, 123, 114, .95);
-      backdrop-filter: blur(10px);
+      background: linear-gradient(135deg, rgba(194, 123, 114, 0.92), rgba(158, 93, 84, 0.9));
+      backdrop-filter: blur(12px) saturate(128%);
+      -webkit-backdrop-filter: blur(12px) saturate(128%);
       border: 1.5px solid rgba(255,255,255,.28);
+      box-shadow: 0 22px 38px rgba(120, 71, 65, 0.2);
     }
 
     /* ── 功能元素虛線框標示 ── */
@@ -694,6 +805,11 @@
       inset: 0px;
       border-radius: 20px;
     }
+
+    #hero-link-group.feature-dash-border::before {
+      inset: -6px;
+      border-radius: 9999px;
+    }
     
     #hero-banner.feature-dash-border.is-active::before {
       border-radius: 0;
@@ -707,6 +823,14 @@
       box-shadow: 0 14px 36px rgba(0,0,0,.1), 0 0 0 3px #C27B72 !important;
       border-color: #C27B72 !important;
       transition: all .3s cubic-bezier(.175,.885,.32,1.275);
+    }
+    @media (hover: hover) and (pointer: fine) {
+      #tech-grid [id^="card-"]:hover {
+        transform: scale(1.04) translateY(-2px);
+        z-index: 50;
+        box-shadow: 0 14px 36px rgba(0,0,0,.1), 0 0 0 3px #C27B72;
+        border-color: #C27B72;
+      }
     }
 
     /* ── 微互動演示：暗化疊層 ── */
@@ -742,11 +866,355 @@
        Hero 區背景與弧線波浪效果
        ══════════════════════════════════════════ */
     #hero-banner {
-      background: url('hero模擬.png') center 50% / cover no-repeat;
+      background:
+        linear-gradient(135deg, rgba(244, 241, 234, 0.14), rgba(226, 233, 223, 0.18)),
+        url('hero模擬.png') center 50% / cover no-repeat;
       will-change: background-position;
+      isolation: isolate;
+    }
+    #hero-banner::after {
+      content: '';
+      position: absolute;
+      pointer-events: none;
+      z-index: 0;
+    }
+    #hero-banner::after {
+      right: -4%;
+      top: 4%;
+      width: 420px;
+      height: 420px;
+      border-radius: 9999px;
+      background: radial-gradient(circle, rgba(214, 220, 207, 0.32) 0%, rgba(214, 220, 207, 0.16) 38%, transparent 72%);
+    }
+    .hero-brand-frame,
+    .hero-brand-frame::before,
+    .hero-brand-frame::after,
+    .hero-brand-seal,
+    .hero-brand-leaf {
+      position: absolute;
+      pointer-events: none;
+      z-index: 1;
+    }
+    .hero-brand-frame {
+      inset: 32px 34px 120px;
+      border: 1px solid rgba(194, 169, 120, 0.22);
+      border-radius: 34px;
+      opacity: .9;
+      mask-image: linear-gradient(180deg, rgba(0,0,0,.18), rgba(0,0,0,.9) 20%, rgba(0,0,0,.9) 82%, transparent);
+    }
+    .hero-brand-frame::before,
+    .hero-brand-frame::after {
+      content: '';
+      width: 72px;
+      height: 72px;
+      border-color: rgba(194, 169, 120, 0.44);
+      border-style: solid;
+    }
+    .hero-brand-frame::before {
+      top: -1px;
+      left: -1px;
+      border-width: 1.5px 0 0 1.5px;
+      border-top-left-radius: 28px;
+    }
+    .hero-brand-frame::after {
+      right: -1px;
+      bottom: -1px;
+      border-width: 0 1.5px 1.5px 0;
+      border-bottom-right-radius: 28px;
+    }
+    .hero-brand-seal {
+      top: 34px;
+      right: 34px;
+      width: 118px;
+      height: 118px;
+      border-radius: 9999px;
+      border: 1px solid rgba(194, 169, 120, 0.32);
+      background: radial-gradient(circle at 30% 30%, rgba(255,255,255,.56), rgba(223, 210, 189, 0.16));
+      box-shadow: inset 0 0 0 10px rgba(255,255,255,.22);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .hero-brand-seal::before,
+    .hero-brand-seal::after {
+      content: '';
+      position: absolute;
+      border-radius: 9999px;
+      border: 1px solid rgba(194, 169, 120, 0.3);
+      inset: 12px;
+    }
+    .hero-brand-seal::after {
+      inset: 22px;
+      border-style: dashed;
+      opacity: .55;
+    }
+    .hero-brand-seal span {
+      font-family: "Noto Serif TC", serif;
+      font-size: .74rem;
+      font-weight: 700;
+      line-height: 1.5;
+      letter-spacing: .22em;
+      text-align: center;
+      color: rgba(132, 111, 74, 0.88);
+      writing-mode: vertical-rl;
+      text-orientation: mixed;
+    }
+    .hero-brand-leaf {
+      left: 40px;
+      bottom: 142px;
+      width: 188px;
+      height: 188px;
+      opacity: .28;
+      color: rgba(123, 145, 126, 0.56);
+    }
+    .hero-brand-leaf svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+    #hero-banner > p:first-of-type {
+      letter-spacing: .42em;
+      font-weight: 700;
+      opacity: .76;
+    }
+    #hero-banner h2 {
+      letter-spacing: .2em;
+      line-height: 1.12;
+      text-wrap: balance;
+      text-shadow: 0 2px 10px rgba(255,255,255,.28);
+    }
+    #hero-banner p:not(:first-of-type) {
+      letter-spacing: .09em;
+      line-height: 1.92;
+      max-width: 40rem;
+    }
+    #hero-cta-btn {
+      min-height: 58px;
+      padding-left: 2rem;
+      padding-right: 2rem;
+      letter-spacing: .24em;
+      font-weight: 700;
+      box-shadow: 0 16px 28px rgba(84, 103, 86, 0.16), inset 0 1px 0 rgba(255,255,255,.18);
+    }
+    @keyframes hero-dot-pulse {
+      0%,
+      100% {
+        box-shadow: 0 0 0 0 rgba(255,255,255,0.34), 0 0 18px rgba(255,255,255,0.24), 0 10px 22px rgba(24, 34, 47, 0.18);
+      }
+      50% {
+        box-shadow: 0 0 0 10px rgba(255,255,255,0), 0 0 28px rgba(255,255,255,0.52), 0 12px 26px rgba(24, 34, 47, 0.2);
+      }
+    }
+    .hero-link-dots {
+      position: absolute;
+      top: 8.2rem;
+      left: -2.8rem;
+      z-index: 150;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 10px;
+      padding: .55rem .45rem;
+      border-radius: 9999px;
+      background: linear-gradient(180deg, rgba(95, 109, 95, 0.14), rgba(255,255,255,0.08));
+      box-shadow: inset 0 1px 0 rgba(255,255,255,0.16);
+      backdrop-filter: blur(6px);
+      -webkit-backdrop-filter: blur(6px);
+    }
+    .hero-link-dot {
+      position: relative;
+      width: 20px;
+      height: 20px;
+      border-radius: 9999px;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      flex-shrink: 0;
+      background: rgba(255,255,255,.96);
+      border: 1.5px solid rgba(255,255,255,.98);
+      box-shadow: 0 0 0 1px rgba(101, 112, 103, 0.28), 0 8px 18px rgba(24, 34, 47, 0.2);
+      backdrop-filter: blur(4px);
+      -webkit-backdrop-filter: blur(4px);
+      transition: transform .25s ease, background-color .25s ease, box-shadow .25s ease, opacity .25s ease;
+    }
+    .hero-link-dot::after {
+      content: '';
+      position: absolute;
+      inset: -5px;
+      border-radius: 9999px;
+      border: 1px solid rgba(87, 99, 91, 0.16);
+      background: radial-gradient(circle, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 72%);
+      pointer-events: none;
+    }
+    .hero-link-dot::before {
+      content: attr(data-label);
+      position: absolute;
+      left: calc(100% + 12px);
+      top: 50%;
+      transform: translateX(-8px) translateY(-50%);
+      min-width: 4rem;
+      padding: .62rem .82rem;
+      border-radius: 12px;
+      background: rgba(34, 34, 34, 0.88);
+      color: #fff;
+      font-family: "Noto Serif TC", serif;
+      font-size: 1.1rem;
+      font-weight: 700;
+      letter-spacing: .08em;
+      line-height: 1;
+      white-space: nowrap;
+      opacity: 0;
+      pointer-events: none;
+      box-shadow: 0 10px 24px rgba(17, 24, 39, 0.24);
+      transition: opacity .2s ease, transform .2s ease;
+    }
+    .hero-link-dot:hover::before,
+    .hero-link-dot:focus-visible::before {
+      opacity: 1;
+      transform: translateX(0) translateY(-50%);
+    }
+    .hero-link-dot.is-active,
+    .hero-link-dot:hover,
+    .hero-link-dot:focus-visible {
+      background: rgba(255,255,255,.98);
+      border-color: rgba(255,255,255,.95);
+      animation: hero-dot-pulse 1.8s infinite ease-in-out;
+      transform: scale(1.08);
+      box-shadow: 0 0 0 1px rgba(86, 98, 90, 0.34), 0 0 18px rgba(255,255,255,0.42), 0 10px 22px rgba(24, 34, 47, 0.22);
+      text-decoration: none;
+    }
+    .hero-link-dot.is-active {
+      width: 24px;
+      height: 24px;
+    }
+    .hero-link-dot:focus-visible {
+      outline: 2px solid #ffffff;
+      outline-offset: 4px;
+    }
+    .hero-link-dot:not(.is-active) {
+      opacity: .9;
+    }
+    @media (max-width: 767px) {
+      .hero-link-dots {
+        top: 7.2rem;
+        left: -1.95rem;
+        gap: 8px;
+        padding: .45rem .35rem;
+      }
+      .hero-link-dot {
+        width: 18px;
+        height: 18px;
+      }
+      .hero-link-dot.is-active {
+        width: 22px;
+        height: 22px;
+      }
+      .hero-link-dot::before {
+        min-width: 3.6rem;
+        padding: .55rem .72rem;
+        font-size: 1rem;
+        left: calc(100% + 10px);
+      }
+      body:not(.mobile-preview-mode) .hero-link-dots {
+        top: 6.45rem;
+        left: auto;
+        right: .8rem;
+      }
+      body:not(.mobile-preview-mode) .hero-link-dot::before {
+        left: auto;
+        right: calc(100% + 10px);
+        transform: translateX(8px) translateY(-50%);
+      }
+      body:not(.mobile-preview-mode) .hero-link-dot:hover::before,
+      body:not(.mobile-preview-mode) .hero-link-dot:focus-visible::before {
+        transform: translateX(0) translateY(-50%);
+      }
     }
     body.mobile-preview-mode #hero-banner {
       background-position: 80% 30%;
+    }
+
+    #form-card,
+    #map-card,
+    .cta-stats {
+      border-color: rgba(217, 221, 214, 0.92) !important;
+      box-shadow: 0 20px 34px rgba(85, 94, 84, 0.08), inset 0 1px 0 rgba(255,255,255,0.75);
+      backdrop-filter: blur(18px) saturate(120%);
+      -webkit-backdrop-filter: blur(18px) saturate(120%);
+    }
+    #tech-grid > div {
+      background: #ffffff;
+      border-color: rgba(229, 231, 235, 1) !important;
+      box-shadow: 0 8px 22px rgba(45, 51, 47, 0.06);
+      backdrop-filter: none;
+      -webkit-backdrop-filter: none;
+    }
+    #form-card,
+    #map-card,
+    .cta-stats {
+      background: linear-gradient(180deg, rgba(255,255,255,0.86), rgba(247, 244, 238, 0.78));
+    }
+    .cta-panel {
+      position: relative;
+      isolation: isolate;
+      border-color: rgba(213, 220, 212, 0.95) !important;
+      box-shadow: 0 26px 54px rgba(70, 80, 70, 0.14), inset 0 1px 0 rgba(255,255,255,0.8);
+    }
+    .cta-panel::before,
+    .cta-panel::after {
+      content: '';
+      position: absolute;
+      pointer-events: none;
+      z-index: 0;
+    }
+    .cta-panel::before {
+      left: -10%;
+      right: -7%;
+      bottom: -18%;
+      height: 250px;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0), rgba(237, 228, 215, 0.6)),
+        linear-gradient(90deg, rgba(214, 222, 212, 0.14), rgba(233, 222, 208, 0.14));
+      clip-path: path('M0,146 C120,92 216,176 356,162 C496,148 582,68 730,68 C892,68 992,170 1142,176 C1290,182 1392,114 1540,50 L1540,280 L0,280 Z');
+      opacity: .88;
+    }
+    .cta-panel::after {
+      top: -22%;
+      right: -8%;
+      width: 300px;
+      height: 300px;
+      border-radius: 9999px;
+      background: radial-gradient(circle, rgba(206, 213, 201, 0.28) 0%, rgba(206, 213, 201, 0.12) 46%, transparent 72%);
+    }
+    .cta-panel > * {
+      position: relative;
+      z-index: 1;
+    }
+    .cta-panel p:first-child,
+    .cta-grid p.text-xs.md\:text-sm {
+      letter-spacing: .28em;
+      font-weight: 700;
+      opacity: .72;
+    }
+    .cta-panel h3 {
+      letter-spacing: .08em;
+      line-height: 1.18;
+      text-wrap: balance;
+    }
+    .cta-panel .cta-actions button {
+      min-height: 56px;
+      padding-left: 1.75rem;
+      padding-right: 1.75rem;
+      border-radius: 9999px;
+      letter-spacing: .12em;
+      font-weight: 700;
+    }
+    .cta-panel .cta-actions button:first-child {
+      box-shadow: 0 16px 28px rgba(78, 95, 79, 0.18), inset 0 1px 0 rgba(255,255,255,.14);
+    }
+    .cta-panel .cta-actions button:last-child {
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
     }
 
     /* ── Sticky CTA：與右側服務列表同層級浮動，定位於模擬框內 ── */
@@ -1177,6 +1645,59 @@
     body.mobile-preview-mode #mobile-menu-panel:not(.hidden) {
       display: flex !important;
     }
+    #back-to-desktop-btn {
+      position: absolute;
+      top: -1px;
+      right: 24px;
+      z-index: 1210;
+      display: inline-flex;
+      align-items: center;
+      gap: .45rem;
+      padding: .48rem .88rem;
+      border-radius: 9999px;
+      border: 2px dashed #C27B72;
+      background: rgba(255,255,255,0.97);
+      color: #9E4F48;
+      box-shadow: 0 4px 16px rgba(194,123,114,.18), 0 1px 4px rgba(158,79,72,.08);
+      backdrop-filter: blur(10px);
+      -webkit-backdrop-filter: blur(10px);
+      font-size: .82rem;
+      font-weight: 700;
+      letter-spacing: .1em;
+      opacity: 0;
+      pointer-events: none;
+      transform: translateY(-50%) scale(.94);
+      transition: opacity .25s ease, transform .25s ease, background-color .2s ease, box-shadow .2s ease;
+    }
+    #back-to-desktop-btn i {
+      font-size: .95rem;
+      color: #C27B72;
+    }
+    #back-to-desktop-btn:hover {
+      background: rgba(249,241,240,0.98);
+      box-shadow: 0 6px 22px rgba(194,123,114,.28);
+    }
+    body.mobile-preview-mode #back-to-desktop-btn {
+      opacity: 1;
+      pointer-events: auto;
+      transform: translateY(-50%) scale(1);
+    }
+
+    /* ── RWD 手機預覽：紅色虛線框圍住預覽視窗（始終維持桌機寬度） ── */
+    #preview-rwd-border {
+      position: absolute;
+      inset: -5px;
+      border: 2px dashed #C27B72;
+      border-radius: 18px;
+      pointer-events: none;
+      z-index: 1200;
+      opacity: 0;
+      transition: opacity .35s ease;
+      animation: pulseBorder 2s infinite;
+    }
+    body.mobile-preview-mode #preview-rwd-border {
+      opacity: 1;
+    }
 
     /* ── 手機版優化：實機與 RWD 模擬皆適用 ── */
     body.mobile-preview-mode #tech-grid {
@@ -1337,24 +1858,63 @@
         transform: none !important;
       }
       #hero-banner {
-        min-height: 460px;
-        padding-top: 112px;
-        padding-bottom: 188px;
+        min-height: 470px;
+        padding-top: 108px;
+        padding-bottom: 176px;
         background-position: 62% 50%;
+      }
+      #hero-banner::after {
+        top: 8%;
+        right: -22%;
+        width: 260px;
+        height: 260px;
+        opacity: .85;
+      }
+      .hero-brand-frame {
+        inset: 26px 18px 110px;
+        border-radius: 24px;
+      }
+      .hero-brand-frame::before,
+      .hero-brand-frame::after {
+        width: 52px;
+        height: 52px;
+      }
+      .hero-brand-seal {
+        top: 26px;
+        right: 18px;
+        width: 84px;
+        height: 84px;
+      }
+      .hero-brand-seal span {
+        font-size: .58rem;
+        letter-spacing: .16em;
+      }
+      .hero-brand-leaf {
+        left: 12px;
+        bottom: 118px;
+        width: 126px;
+        height: 126px;
+        opacity: .2;
       }
       #hero-banner h2 {
         font-size: clamp(2.15rem, 9vw, 2.75rem);
-        line-height: 1.2;
-        letter-spacing: .06em;
+        line-height: 1.14;
+        letter-spacing: .1em;
+      }
+      #hero-banner > p:first-of-type {
+        letter-spacing: .24em;
+        font-size: .72rem;
       }
       #hero-banner p {
-        letter-spacing: .06em;
+        letter-spacing: .04em;
+        line-height: 1.74;
       }
       #hero-cta-btn {
         width: 100%;
         min-height: 52px;
         padding-left: 24px;
         padding-right: 24px;
+        letter-spacing: .16em;
       }
       body:not(.mobile-preview-mode) #ann-uiux-hover {
         top: calc(100% + 12px) !important;
@@ -1437,18 +1997,47 @@
         padding: 20px !important;
         border-radius: 20px !important;
       }
+      #preview-browser .cta-panel::before {
+        left: -12%;
+        right: -12%;
+        bottom: -12%;
+        height: 170px;
+        clip-path: path('M0,96 C82,58 166,126 266,126 C386,126 454,78 568,78 C692,78 772,136 902,132 C1032,128 1126,96 1280,46 L1280,190 L0,190 Z');
+        opacity: .82;
+      }
+      #preview-browser .cta-panel::after {
+        top: -16%;
+        right: -18%;
+        width: 210px;
+        height: 210px;
+      }
       #preview-browser .cta-panel h3 {
         font-size: 1.65rem !important;
-        line-height: 1.35 !important;
+        line-height: 1.26 !important;
+        letter-spacing: .05em;
+      }
+      #preview-browser .cta-panel p.text-xs,
+      #preview-browser .cta-grid p.text-xs.md\:text-sm {
+        letter-spacing: .16em !important;
       }
       #preview-browser .cta-actions {
         flex-direction: column;
         align-items: stretch;
+        gap: 10px;
       }
       #preview-browser .cta-actions button {
         width: 100%;
         text-align: center;
-        min-height: 50px;
+        min-height: 52px;
+        letter-spacing: .08em;
+      }
+      #preview-browser .max-w-5xl h2,
+      #preview-browser section.max-w-5xl h2,
+      #tech-grid h3,
+      #form-card h3,
+      .cta-panel h3,
+      footer h4 {
+        letter-spacing: .05em;
       }
       #preview-browser .cta-stats {
         padding: 16px !important;
@@ -1490,6 +2079,7 @@
       }
       #top-control-bar h1 {
         font-size: 1.78rem;
+        letter-spacing: .05em;
       }
       #hero-banner {
         min-height: 420px;
@@ -1497,7 +2087,31 @@
         padding-bottom: 160px;
       }
       #hero-banner h2 {
-        letter-spacing: .03em;
+        letter-spacing: .06em;
+      }
+      #hero-banner > p:first-of-type {
+        letter-spacing: .18em;
+      }
+      .hero-brand-frame {
+        inset: 20px 14px 102px;
+      }
+      .hero-brand-seal {
+        width: 74px;
+        height: 74px;
+        top: 22px;
+        right: 14px;
+      }
+      .hero-brand-leaf {
+        left: -4px;
+        width: 108px;
+        height: 108px;
+        bottom: 112px;
+      }
+      #preview-browser .cta-panel h3 {
+        font-size: 1.48rem !important;
+      }
+      #preview-browser .cta-actions button {
+        min-height: 50px;
       }
       #preview-browser > .bg-gray-100 {
         padding-left: 12px;
@@ -1656,7 +2270,7 @@
        ═══════════════════════════════════════════════════ -->
   <div id="sticky-cta-container" class="sticky-cta-container">
     <div id="floating-cta-wrap" class="relative feature-dash-border is-dimmed flex flex-col items-center gap-3 px-4 py-4">
-      <a id="floating-cta-phone" href="tel:0973591518" aria-label="撥打 0973591518" class="w-16 h-16 rounded-full bg-white text-nature-600 border border-nature-200 shadow-xl flex items-center justify-center relative z-10 transition-transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-nature-200">
+      <a id="floating-cta-phone" href="tel:0973591518" aria-label="撥打專案業務直撥專線 0973591518" class="w-16 h-16 rounded-full bg-white text-nature-600 border border-nature-200 shadow-xl flex items-center justify-center relative z-10 transition-transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-nature-200">
         <i class="ph-fill ph-phone-call text-2xl"></i>
       </a>
       <a href="https://line.me/ti/p/~tp6yj" target="_blank" rel="noreferrer" aria-label="開啟 LINE 聯絡" class="w-16 h-16 rounded-full bg-nature-500 text-white border border-nature-400 shadow-xl flex items-center justify-center relative z-10 transition-transform hover:scale-[1.03] focus:outline-none focus:ring-2 focus:ring-nature-200">
@@ -1696,9 +2310,10 @@
         <i class="ph-fill ph-phone-call text-2xl"></i>
       </div>
       <p class="text-xs tracking-[0.2em] uppercase text-nature-500 mb-2">Desk Call Prompt</p>
-      <h3 class="text-2xl font-bold text-nature-800 mb-2">撥打電話</h3>
-      <p class="text-sm text-gray-500 leading-relaxed mb-5">桌機環境無法直接撥號，請使用手機撥打，或先複製以下電話號碼。</p>
+      <h3 class="text-2xl font-bold text-nature-800 mb-2">專案業務直撥專線</h3>
+      <p class="text-sm text-gray-500 leading-relaxed mb-5">桌機環境無法直接撥號，請使用手機撥打，或先複製以下專線電話。</p>
       <div class="rounded-2xl border border-nature-100 bg-nature-50/80 px-4 py-4 mb-4">
+        <p class="text-xs font-bold tracking-[0.18em] text-nature-500 mb-2">專案業務直撥專線</p>
         <p id="phone-contact-number" class="text-2xl font-bold tracking-[0.08em] text-nature-800">0973591518</p>
       </div>
       <div class="flex gap-3">
@@ -1719,9 +2334,9 @@
         <i class="ph-fill ph-crown text-xl"></i>
       </div>
       <div>
-        <h1 class="text-xl sm:text-2xl font-serif font-bold text-nature-800">丹淳 Danchun 官網提案</h1>
+        <h1 class="text-xl sm:text-2xl font-serif font-bold text-nature-800">單純 Danchun 官網提案</h1>
         <p class="text-sm text-gray-500 mt-0.5 leading-relaxed">
-          <span class="hidden md:inline">將滑鼠移至<span class="text-morandi-500 font-semibold">右側服務列表</span>，檢視丹淳品牌官網的互動提案重點</span>
+          <span class="hidden md:inline">將滑鼠移至<span class="text-morandi-500 font-semibold">右側服務列表</span>，檢視單純品牌官網的互動提案重點</span>
           <span class="md:hidden">點選下方<span class="text-morandi-500 font-semibold">手機版重點導覽</span>，逐項探索網站設計特點</span>
         </p>
       </div>
@@ -1742,7 +2357,18 @@
     <!-- ─────────────────────────────────────────
          模擬瀏覽器視窗
          ───────────────────────────────────────── -->
-    <div id="preview-browser" class="preview-browser bg-white rounded-t-xl rounded-b-lg shadow-2xl overflow-visible border border-gray-200 mb-24 relative fade-in" style="animation-delay:.1s">
+    <div id="preview-browser-wrapper" class="relative mb-24">
+
+      <!-- RWD 手機預覽虛線框（不随 preview-browser 縮寬，始終維持桌機寬度） -->
+      <div id="preview-rwd-border" aria-hidden="true"></div>
+
+      <!-- RWD 模式：回到電腦版按鈕（坐落於紅色虛線框頂邊） -->
+      <button id="back-to-desktop-btn" type="button" aria-label="回到電腦版預覽">
+        <i class="ph ph-desktop"></i>
+        <span>回到電腦版</span>
+      </button>
+
+      <div id="preview-browser" class="preview-browser bg-white rounded-t-xl rounded-b-lg shadow-2xl overflow-visible border border-gray-200 relative fade-in" style="animation-delay:.1s">
 
       <!-- 瀏覽器標題列 -->
       <div class="bg-gray-100 px-4 py-3 border-b border-gray-200 flex items-center gap-2">
@@ -1796,7 +2422,7 @@
             <div class="flex items-center gap-2 text-nature-500">
               <i class="ph ph-flower-lotus text-[30px] sm:text-3xl"></i>
               <div class="font-serif font-bold text-lg sm:text-xl leading-none tracking-[0.14em] sm:tracking-widest text-nature-800">
-                丹淳<br><span class="text-sm font-sans tracking-[.2em] text-nature-500">DANCHUN</span>
+                單純<br><span class="text-sm font-sans tracking-[.2em] text-nature-500">DANCHUN</span>
               </div>
             </div>
             <!-- Nav with Dropdowns -->
@@ -1893,10 +2519,6 @@
               <button id="mobile-menu-backdrop" type="button" class="mobile-menu-backdrop" aria-label="關閉選單背景"></button>
               <div class="mobile-menu-surface mobile-menu-panel-enter rounded-[28px] p-4 sm:p-5 text-sm text-gray-700">
                 <div class="flex items-start justify-between gap-4 px-2 pb-4 mb-4 border-b border-nature-100">
-                  <div>
-                    <p class="text-[11px] tracking-[0.24em] uppercase text-nature-500">Mobile Navigation</p>
-                    <p id="mobile-menu-title" class="text-lg font-bold text-nature-800 mt-1">快速瀏覽丹淳網站架構</p>
-                  </div>
                   <button id="mobile-menu-close" type="button" class="w-12 h-12 rounded-2xl border border-gray-200 bg-white text-gray-500 flex items-center justify-center shadow-sm hover:bg-gray-50 transition-colors" aria-label="關閉選單">
                     <i class="ph ph-x text-2xl"></i>
                   </button>
@@ -1905,10 +2527,6 @@
                 <div class="mobile-menu-dual">
                   <div id="mobile-menu-sub" class="space-y-3">
                     <div class="flex items-center justify-between">
-                      <button id="mobile-menu-back" type="button" class="inline-flex items-center gap-1 rounded-full border border-gray-200 bg-white px-3 py-1.5 text-xs font-bold text-gray-500 hover:bg-gray-50 transition-colors">
-                        <i class="ph ph-caret-left"></i>
-                        清除
-                      </button>
                       <span id="mobile-menu-subtitle" class="text-xs tracking-[0.18em] uppercase text-nature-400">選擇右側主選單</span>
                     </div>
 
@@ -1989,6 +2607,12 @@
             </div>
           </header>
 
+          <div id="hero-link-group" class="hero-link-dots feature-dash-border is-dimmed" aria-label="Hero 互動點">
+            <a href="首頁_webp.html" class="hero-link-dot" aria-label="送別" data-label="送別"></a>
+            <span class="hero-link-dot is-active" aria-current="page" aria-label="辭生" data-label="辭生"></span>
+            <span class="hero-link-dot" aria-hidden="true" data-label="啟靈"></span>
+          </div>
+
           <!-- ── Mock Hero Banner ── -->
         <div id="hero-banner" class="relative w-full min-h-[560px] flex flex-col items-center justify-center text-center px-6 pt-32 pb-60 overflow-hidden feature-dash-border is-dimmed">
           <!-- 背景裝飾 -->
@@ -1997,7 +2621,7 @@
 
           <p class="text-xs md:text-sm tracking-[0.35em] text-nature-600 uppercase mb-4 z-10">Danchun Web Design Studio</p>
           <h2 class="text-4xl md:text-6xl font-serif font-bold text-nature-800 mb-5 tracking-[0.18em] z-10 drop-shadow-sm leading-tight max-w-4xl">
-            丹淳・品牌網站設計專家
+            單純・品牌網站設計專家
           </h2>
           <p class="text-base md:text-lg text-gray-600 tracking-[0.12em] mb-10 z-10 max-w-2xl leading-relaxed">專注企業官網、轉換型頁面與技術優化，讓你的網站不只好看，更能穩定帶來詢問與訂單。</p>
 
@@ -2019,7 +2643,7 @@
           </div>
 
           <!-- ▌標示：品牌視覺 CI -->
-          <div id="ann-uiux-ci" class="annotation-wrapper absolute top-10 left-10 w-72 z-50">
+          <div id="ann-uiux-ci" class="annotation-wrapper absolute top-8 left-4 w-72 z-50">
             <div class="absolute inset-4 rounded-lg annotation-dash pointer-events-none border-2"></div>
             <div class="annotation-content ann-box relative p-4 rounded-xl shadow-2xl">
               <div class="flex items-center gap-2 mb-2 pb-2 border-b border-white/20">
@@ -2162,7 +2786,7 @@
           <!-- 地圖 -->
           <div id="map-card" class="relative bg-gray-100 rounded-2xl overflow-visible flex flex-col border border-gray-200 min-h-[320px] feature-dash-border is-dimmed">
             <iframe
-              title="丹淳有限公司地圖"
+              title="單純有限公司地圖"
               class="w-full h-full min-h-[320px] rounded-2xl"
               src="https://maps.google.com/maps?q=%E8%87%BA%E4%B8%AD%E5%B8%82%E5%A4%A7%E9%87%8C%E5%8D%80%E9%95%B7%E6%A6%AE%E9%87%8C%E5%A4%A7%E9%87%8C%E8%B7%AF31%E4%B9%8B2%E4%B9%8B4%E8%99%9F&z=17&output=embed"
               loading="lazy"
@@ -2219,7 +2843,7 @@
                   讓網站成為最穩定的業務來源
                 </h3>
                 <p class="text-gray-700 leading-relaxed mb-6 md:text-[17px]">
-                  從品牌定位、UI/UX 設計到開發上線，丹淳提供一站式網站建置流程，幫助企業提升專業形象並放大詢問轉換率。
+                  從品牌定位、UI/UX 設計到開發上線，單純提供一站式網站建置流程，幫助企業提升專業形象並放大詢問轉換率。
                 </p>
 
                 <div class="flex flex-wrap gap-3 mb-7 text-sm text-nature-700">
@@ -2229,7 +2853,7 @@
                 </div>
 
                 <div class="cta-actions flex flex-wrap items-center gap-3">
-                  <button class="px-6 py-3 rounded-full bg-nature-600 hover:bg-nature-700 text-white font-bold tracking-wide transition-all shadow-md">
+                  <button id="cta-consult-btn" type="button" data-schedule-url="https://calendly.com/change280/30min" data-schedule-locale="zh-CN" class="px-6 py-3 rounded-full bg-nature-600 hover:bg-nature-700 text-white font-bold tracking-wide transition-all shadow-md">
                     預約 30 分鐘專案諮詢
                   </button>
                   <button class="px-6 py-3 rounded-full border border-nature-300 hover:bg-white text-nature-700 font-medium tracking-wide transition-all">
@@ -2265,10 +2889,10 @@
             <div class="md:col-span-2">
               <div class="flex items-center gap-3 text-nature-600 mb-4">
                 <i class="ph ph-flower-lotus text-3xl"></i>
-                <div class="font-serif font-bold text-2xl leading-none tracking-widest text-nature-800">丹淳 DANCHUN</div>
+                <div class="font-serif font-bold text-2xl leading-none tracking-widest text-nature-800">單純 DANCHUN</div>
               </div>
               <p class="text-gray-600 leading-relaxed mb-4 max-w-md">
-                丹淳是提供網站設計與數位整合的專業團隊，從品牌定位、UI/UX 設計到技術上線，協助企業打造可持續成長的官網。
+                單純是提供網站設計與數位整合的專業團隊，從品牌定位、UI/UX 設計到技術上線，協助企業打造可持續成長的官網。
               </p>
               <div class="flex flex-wrap gap-2 text-xs text-gray-500 mb-5">
                 <span class="px-2.5 py-1 rounded-full bg-gray-100 border border-gray-200">全台遠端服務</span>
@@ -2303,8 +2927,8 @@
             <div>
               <h4 class="font-bold text-nature-800 mb-3">聯絡我們</h4>
               <ul class="space-y-2 text-gray-600">
-                <li>0973591518</li>
-                <li>臺中市大里區長榮里大里路31之2之4號</li>
+                <li>專案業務直撥專線：0973591518</li>
+                <li>臺中市大里區長榮里大里路</li>
                 <li class="pt-1 flex items-center gap-2 text-nature-600">
                   <i class="ph ph-clock"></i> Mon - Fri 09:00 - 18:00
                 </li>
@@ -2313,7 +2937,7 @@
           </div>
 
           <div class="footer-meta max-w-5xl mx-auto mt-8 pt-5 border-t border-gray-200 flex flex-wrap items-center justify-between gap-3 text-xs text-gray-500">
-            <p>© 2026 丹淳 Danchun. All rights reserved.</p>
+            <p>© 2026 單純 Danchun. All rights reserved.</p>
             <div class="flex items-center gap-4">
               <span>隱私權政策</span>
               <span>服務條款</span>
@@ -2324,6 +2948,8 @@
 
       </div><!-- / mockup-content -->
     </div><!-- / browser -->
+
+    </div><!-- / preview-browser-wrapper -->
 
 
 
@@ -2582,12 +3208,14 @@
       const mobileMenuSubtitle = document.getElementById('mobile-menu-subtitle');
       const mobileMenuMainButtons = mobileMenuPanel ? mobileMenuPanel.querySelectorAll('[data-menu-group]') : [];
       const mobileMenuSubSections = mobileMenuPanel ? mobileMenuPanel.querySelectorAll('[data-submenu-group]') : [];
+      const backToDesktopBtn = document.getElementById('back-to-desktop-btn');
       const mockHeader = document.getElementById('mock-header');
       const topControlBar = document.getElementById('top-control-bar');
       const stickyCtaContainer = document.getElementById('sticky-cta-container');
       const floatingCtaWrap = document.getElementById('floating-cta-wrap');
       const floatingCtaPhoneLink = document.getElementById('floating-cta-phone');
       const floatingCtaFormButton = document.getElementById('floating-cta-form');
+      const ctaConsultButton = document.getElementById('cta-consult-btn');
       const phoneContactModal = document.getElementById('phone-contact-modal');
       const phoneContactOverlay = document.getElementById('phone-contact-overlay');
       const phoneContactClose = document.getElementById('phone-contact-close');
@@ -2596,7 +3224,10 @@
       const PHONE_NUMBER = '0973591518';
       const contactFormCard = document.getElementById('form-card');
       const formNameInput = document.getElementById('form-name');
+      const techGridCards = document.querySelectorAll('#tech-grid [id^="card-"]');
       const annUiuxNav = document.getElementById('ann-uiux-nav');
+      const DEFAULT_SCHEDULE_URL = '';
+      const DEFAULT_SCHEDULE_LOCALE = 'zh-CN';
       let isAllShowing     = false;
       let isMobilePreviewLocked = false;
       let stickyCtaRafId = null;
@@ -2961,6 +3592,19 @@
         }
       }
 
+      if (backToDesktopBtn) {
+        backToDesktopBtn.addEventListener('click', () => {
+          isMobilePreviewLocked = false;
+          setMobilePreviewMode(false);
+
+          const rwdAnnotation = document.getElementById('ann-uiux-rwd');
+          if (rwdAnnotation && !isAllShowing) {
+            rwdAnnotation.classList.remove('annotation-active');
+            rwdAnnotation.classList.add('annotation-dimmed');
+          }
+        });
+      }
+
       function showMobileMenuMain() {
         if (!mobileMenuMain || !mobileMenuSub) return;
         mobileMenuSubSections.forEach(section => section.classList.add('hidden'));
@@ -3053,6 +3697,40 @@
         }
       }
 
+      function getConsultScheduleUrl() {
+        if (!ctaConsultButton) return DEFAULT_SCHEDULE_URL;
+        const configuredUrl = (ctaConsultButton.dataset.scheduleUrl || '').trim();
+        return configuredUrl || DEFAULT_SCHEDULE_URL;
+      }
+
+      function getLocalizedScheduleUrl(url) {
+        if (!url) return '';
+
+        try {
+          const parsed = new URL(url, window.location.href);
+          const host = parsed.hostname.toLowerCase();
+          const isCalendlyHost = host === 'calendly.com' || host.endsWith('.calendly.com');
+          const preferredLocale = (ctaConsultButton && ctaConsultButton.dataset.scheduleLocale
+            ? ctaConsultButton.dataset.scheduleLocale
+            : DEFAULT_SCHEDULE_LOCALE).trim();
+
+          if (isCalendlyHost && preferredLocale && !parsed.searchParams.has('locale')) {
+            parsed.searchParams.set('locale', preferredLocale);
+          }
+
+          return parsed.toString();
+        } catch (error) {
+          return url;
+        }
+      }
+
+      function openConsultScheduler(url) {
+        if (!url) return false;
+        const localizedUrl = getLocalizedScheduleUrl(url);
+        window.open(localizedUrl, '_blank', 'noopener,noreferrer');
+        return true;
+      }
+
       function isDesktopPhonePromptMode() {
         return window.matchMedia('(hover: hover) and (pointer: fine)').matches;
       }
@@ -3141,6 +3819,14 @@
         });
       }
 
+      if (ctaConsultButton) {
+        ctaConsultButton.addEventListener('click', () => {
+          const scheduleUrl = getConsultScheduleUrl();
+          if (openConsultScheduler(scheduleUrl)) return;
+          scrollToContactFormFromCta();
+        });
+      }
+
       if (floatingCtaWrap) {
         floatingCtaWrap.addEventListener('click', (event) => {
           if (!isMobileAnnotationMode() || isAllShowing) return;
@@ -3178,7 +3864,7 @@
         // 注意：ann-uiux-rwd 已從此映射中移除，保持其浮動徽章的原始位置
         // 'ann-uiux-rwd': 'hero-banner',
         'ann-uiux-nav': 'mock-header',
-        'ann-uiux-ci': 'hero-banner',
+        'ann-uiux-ci': 'hero-link-group',
         'ann-uiux-hover': 'hero-cta-btn',
         'ann-conv-lang': 'lang-switch-btn',
         'ann-conv-form': 'form-card',
@@ -3812,7 +4498,35 @@
         });
       });
 
+      // Tech card emphasis: desktop hover handled by CSS; mobile uses tap-to-highlight.
+      function clearTechCardActiveState() {
+        techGridCards.forEach(card => card.classList.remove('card-active'));
+      }
+
+      techGridCards.forEach(card => {
+        card.addEventListener('click', (event) => {
+          if (!isMobileAnnotationMode()) return;
+          const wasActive = card.classList.contains('card-active');
+          clearTechCardActiveState();
+          if (!wasActive) {
+            card.classList.add('card-active');
+          }
+          event.stopPropagation();
+        });
+      });
+
+      document.addEventListener('click', (event) => {
+        if (!isMobileAnnotationMode()) return;
+        const clickTarget = event.target instanceof Element ? event.target : null;
+        if (!clickTarget) return;
+        if (clickTarget.closest('#tech-grid [id^="card-"]')) return;
+        clearTechCardActiveState();
+      });
+
       window.addEventListener('resize', () => {
+        if (!isMobileAnnotationMode()) {
+          clearTechCardActiveState();
+        }
         if (window.innerWidth >= 1024) {
           setMobileMenuOpen(false);
           closeMobileFeatureSheet();
