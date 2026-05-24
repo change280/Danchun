@@ -1882,9 +1882,11 @@
       border-radius: 26px;
       border: 1px solid rgba(255, 255, 255, 0.72);
       background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.12), rgba(255, 255, 255, 0.04)),
         linear-gradient(165deg, rgba(255, 255, 255, 0.56), rgba(255, 255, 255, 0.34)),
-        radial-gradient(88% 70% at 92% 10%, rgba(255, 255, 255, 0.18), transparent 64%);
-      background-blend-mode: screen, screen;
+        radial-gradient(88% 70% at 92% 10%, rgba(255, 255, 255, 0.18), transparent 64%),
+        url('guide模擬C.png') center / cover no-repeat;
+      background-blend-mode: screen, screen, screen, normal;
       box-shadow: 0 24px 52px rgba(112, 98, 148, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.36), inset 0 1px 0 rgba(255, 255, 255, 0.78);
       overflow: hidden;
       backdrop-filter: blur(14px) saturate(108%);
