@@ -2659,14 +2659,20 @@
     }
 
     #mock-header {
-      background: linear-gradient(180deg, rgba(7, 22, 49, 0.96), rgba(6, 18, 39, 0.94)) !important;
-      border-color: rgba(78, 137, 245, 0.22) !important;
-      box-shadow: 0 14px 36px rgba(0, 10, 28, 0.55) !important;
+      background:
+        linear-gradient(180deg, rgba(8, 24, 53, 1), rgba(6, 19, 43, 0.88)),
+        url('hero模擬B.png') center 50% / cover no-repeat !important;
+      border-color: rgba(108, 170, 255, 0.28) !important;
+      box-shadow: 0 14px 36px rgba(0, 10, 28, 0.42), inset 0 1px 0 rgba(184, 224, 255, 0.14) !important;
+      backdrop-filter: blur(14px) saturate(122%) !important;
+      -webkit-backdrop-filter: blur(14px) saturate(122%) !important;
     }
     #mock-header.header-floating {
-      background: linear-gradient(180deg, rgba(8, 24, 53, 0.97), rgba(6, 19, 43, 0.95)) !important;
-      border-color: rgba(92, 155, 255, 0.3) !important;
-      box-shadow: 0 16px 38px rgba(0, 10, 28, 0.58), inset 0 1px 0 rgba(154, 204, 255, 0.12) !important;
+      background:
+        linear-gradient(180deg, rgba(8, 24, 53, 0.7), rgba(6, 19, 43, 0.64)),
+        url('hero模擬B.png') center 26% / cover no-repeat !important;
+      border-color: rgba(118, 182, 255, 0.34) !important;
+      box-shadow: 0 16px 38px rgba(0, 10, 28, 0.46), inset 0 1px 0 rgba(184, 224, 255, 0.16) !important;
     }
     #mock-header .text-nature-500,
     #mock-header .text-nature-800,
@@ -2725,10 +2731,12 @@
       transform: translateX(4px);
     }
     #lang-switch-btn {
-      background: linear-gradient(180deg, rgba(11, 32, 66, 0.9), rgba(8, 24, 52, 0.92)) !important;
+      background: linear-gradient(180deg, rgba(11, 32, 66, 0.72), rgba(8, 24, 52, 0.76)) !important;
       border-color: rgba(104, 164, 255, 0.4) !important;
       color: #dceeff !important;
       box-shadow: inset 0 1px 0 rgba(169, 211, 255, 0.16), 0 12px 24px rgba(3, 11, 29, 0.46) !important;
+      backdrop-filter: blur(10px) saturate(118%) !important;
+      -webkit-backdrop-filter: blur(10px) saturate(118%) !important;
     }
     #lang-switch-btn:hover {
       background: linear-gradient(180deg, rgba(16, 44, 90, 0.95), rgba(11, 31, 68, 0.94)) !important;
@@ -3160,15 +3168,17 @@
     #tech-grid.tech-security-theme > [id^="card-"].tech-security-card {
       overflow: hidden;
       border-radius: 18px !important;
-      border: 1px solid rgba(90, 149, 245, 0.38) !important;
-      background: linear-gradient(165deg, rgba(10, 28, 60, 0.9), rgba(5, 17, 38, 0.94)) !important;
-      box-shadow: 0 14px 30px rgba(2, 10, 24, 0.48), inset 0 1px 0 rgba(140, 197, 255, 0.14) !important;
+      border: 1px solid rgba(124, 183, 255, 0.3) !important;
+      background: linear-gradient(165deg, rgba(11, 28, 61, 0.48), rgba(5, 17, 38, 0.58)) !important;
+      box-shadow: 0 14px 30px rgba(2, 10, 24, 0.36), inset 0 1px 0 rgba(188, 223, 255, 0.18) !important;
+      backdrop-filter: blur(16px) saturate(128%) !important;
+      -webkit-backdrop-filter: blur(16px) saturate(128%) !important;
     }
     #tech-grid.tech-security-theme > [id^="card-"].tech-security-card::after {
       content: '';
       position: absolute;
       inset: 0;
-      background: linear-gradient(135deg, rgba(80, 163, 255, 0.08), transparent 46%, rgba(27, 101, 255, 0.09) 100%);
+      background: linear-gradient(135deg, rgba(126, 193, 255, 0.14), rgba(255, 255, 255, 0.04) 34%, transparent 52%, rgba(51, 127, 255, 0.12) 100%);
       pointer-events: none;
       z-index: 0;
     }
@@ -3194,14 +3204,17 @@
     #tech-grid.tech-security-theme > [id^="card-"].tech-security-card:hover,
     #tech-grid.tech-security-theme > [id^="card-"].tech-security-card.card-active {
       transform: translateY(-4px) scale(1.01) !important;
-      border-color: rgba(113, 208, 255, 0.74) !important;
-      box-shadow: 0 20px 34px rgba(0, 10, 28, 0.58), 0 0 0 1px rgba(95, 201, 255, 0.58), 0 0 26px rgba(70, 171, 255, 0.24) !important;
+      border-color: rgba(146, 214, 255, 0.66) !important;
+      box-shadow: 0 20px 34px rgba(0, 10, 28, 0.46), 0 0 0 1px rgba(123, 207, 255, 0.48), 0 0 22px rgba(85, 182, 255, 0.18) !important;
       z-index: 5;
     }
 
     /* ── Tech 區到頁尾：統一深色底 ── */
     #tech-bottom-unified-bg {
-      background: #050f23 !important;
+      background:
+        linear-gradient(#050f23, #050f23) top / 100% 88px no-repeat,
+        linear-gradient(180deg, rgba(5, 15, 35, 1) 0%, rgba(5, 15, 35, 0.78) 16%, rgba(5, 15, 35, 0.64) 42%, rgba(5, 15, 35, 0.54) 100%),
+        url('back模擬B.png') center top / cover no-repeat !important;
     }
     #tech-bottom-unified-bg .tech-security-heading,
     #tech-bottom-unified-bg #tech-grid.tech-security-theme,
@@ -3527,7 +3540,7 @@
       </div>
 
       <!-- 模擬網頁內容區 -->
-      <div class="relative bg-white pb-24 overflow-visible">
+      <div class="relative bg-white overflow-visible">
 
         <!-- ▌標示：RWD 跨裝置（floating badge） -->
         <div id="ann-uiux-rwd" class="annotation-wrapper absolute top-4 left-4 z-40">
@@ -3733,8 +3746,7 @@
           <div id="hero-link-group" class="hero-link-dots feature-dash-border is-dimmed" aria-label="Hero 互動點">
             <a href="index.html" class="hero-link-dot" aria-label="暮霧" data-label="暮霧"></a>
             <span class="hero-link-dot is-active" aria-current="page" aria-label="月霽" data-label="月霽"></span>
-            <a href="模擬網頁C.html" class="hero-link-dot" aria-label="青岑" data-label="青岑"></a>
-
+            <span class="hero-link-dot" aria-hidden="true" data-label="青岑"></span>
           </div>
 
           <!-- ── Mock Hero Banner ── -->
