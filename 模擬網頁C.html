@@ -3545,6 +3545,35 @@
       border-color: #c89de4 !important;
     }
 
+    /* Desktop return button refinement: visual only */
+    #back-to-desktop-btn {
+      background: linear-gradient(180deg, rgba(255, 251, 255, 0.86), rgba(245, 236, 255, 0.78)) !important;
+      color: #6a5b96 !important;
+      border-color: rgba(200, 157, 228, 0.92) !important;
+      box-shadow: 0 8px 20px rgba(142, 118, 182, 0.2), 0 0 0 1px rgba(214, 184, 238, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.9) !important;
+      backdrop-filter: blur(10px) saturate(118%) !important;
+      -webkit-backdrop-filter: blur(10px) saturate(118%) !important;
+      animation: desktopBtnGlowPastel 3.6s ease-in-out infinite !important;
+    }
+    #back-to-desktop-btn i {
+      color: #a17ad0 !important;
+      text-shadow: 0 0 8px rgba(181, 143, 222, 0.3) !important;
+    }
+    #back-to-desktop-btn:hover {
+      background: linear-gradient(180deg, rgba(255, 255, 255, 0.92), rgba(244, 233, 255, 0.86)) !important;
+      border-color: rgba(191, 146, 224, 0.96) !important;
+      color: #5b4b89 !important;
+      box-shadow: 0 11px 25px rgba(140, 114, 183, 0.24), 0 0 0 1px rgba(203, 166, 232, 0.44), inset 0 1px 0 rgba(255, 255, 255, 0.96) !important;
+    }
+    @keyframes desktopBtnGlowPastel {
+      0%, 100% {
+        box-shadow: 0 8px 20px rgba(142, 118, 182, 0.2), 0 0 0 1px rgba(214, 184, 238, 0.38), inset 0 1px 0 rgba(255, 255, 255, 0.9);
+      }
+      50% {
+        box-shadow: 0 10px 24px rgba(143, 119, 187, 0.24), 0 0 0 1px rgba(206, 166, 236, 0.46), 0 0 14px rgba(205, 173, 237, 0.26), inset 0 1px 0 rgba(255, 255, 255, 0.96);
+      }
+    }
+
     /* Header refinement: color and texture only */
     #top-control-bar {
       background: linear-gradient(180deg, rgba(255,255,255,0.97), rgba(250, 246, 255, 0.95)) !important;
@@ -3590,9 +3619,13 @@
 
     #mock-header,
     #mock-header.header-floating {
-      background: linear-gradient(180deg, rgba(255,255,255,0.985), rgba(252, 249, 255, 0.975)) !important;
-      border-color: rgba(232, 224, 247, 0.95) !important;
-      box-shadow: 0 10px 22px rgba(130, 112, 176, 0.08), inset 0 1px 0 rgba(255,255,255,0.9) !important;
+      background:
+        linear-gradient(180deg, rgba(255,255,255,0.72), rgba(252, 249, 255, 0.62)),
+        url('hero模擬C.png') center 20% / cover no-repeat !important;
+      border-color: rgba(229, 219, 247, 0.76) !important;
+      box-shadow: 0 10px 24px rgba(130, 112, 176, 0.1), inset 0 1px 0 rgba(255,255,255,0.72) !important;
+      backdrop-filter: blur(12px) saturate(114%) !important;
+      -webkit-backdrop-filter: blur(12px) saturate(114%) !important;
     }
     #mock-header .text-nature-500,
     #mock-header .text-nature-800,
@@ -3650,10 +3683,12 @@
       color: #493474 !important;
     }
     #lang-switch-btn {
-      background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250, 245, 255, 0.95)) !important;
-      border-color: rgba(216, 201, 240, 0.9) !important;
+      background: linear-gradient(180deg, rgba(255,255,255,0.82), rgba(250, 245, 255, 0.74)) !important;
+      border-color: rgba(216, 201, 240, 0.78) !important;
       color: #6b5f95 !important;
       box-shadow: inset 0 1px 0 rgba(255,255,255,0.88), 0 5px 12px rgba(139, 118, 186, 0.1) !important;
+      backdrop-filter: blur(8px) saturate(112%) !important;
+      -webkit-backdrop-filter: blur(8px) saturate(112%) !important;
     }
     #lang-switch-btn:hover {
       background: linear-gradient(180deg, rgba(255,255,255,1), rgba(246, 238, 255, 0.97)) !important;
@@ -3929,11 +3964,12 @@
     #tech-bottom-unified-bg footer {
       position: relative;
       overflow: hidden;
-      background: #fffaff !important;
-      border-top-color: transparent !important;
-      box-shadow: none !important;
-      backdrop-filter: none !important;
-      -webkit-backdrop-filter: none !important;
+      background:
+        linear-gradient(180deg, rgba(255, 255, 255, 0.38), rgba(255, 249, 255, 0.28)) !important;
+      border-top-color: rgba(244, 236, 252, 0.78) !important;
+      box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.68), 0 -8px 24px rgba(151, 135, 188, 0.12) !important;
+      backdrop-filter: blur(4px) saturate(112%) !important;
+      -webkit-backdrop-filter: blur(4px) saturate(112%) !important;
     }
     #preview-browser footer::before,
     #tech-bottom-unified-bg footer::before {
@@ -4654,7 +4690,9 @@
 
       <div id="card-tech-cdn" class="tech-security-card bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
         <div class="flex items-center gap-4 mb-4">
-          <div class="tech-security-no bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">01</div>
+          <div class="flex-shrink-0">
+            <img src="01C.webp" alt="01" class="block w-16w h-16 object-contain" />
+          </div>
           <h3 class="text-lg font-bold text-nature-800">CDN 國際節點極速分發</h3>
         </div>
         <p class="text-gray-600 text-sm leading-relaxed">網站部署於全球內容傳遞網路（CDN），串聯多平台與節點，讓訪客無論在台灣或海外都能享受極速載入體驗。</p>
@@ -4662,7 +4700,9 @@
 
       <div id="card-tech-img" class="tech-security-card bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
         <div class="flex items-center gap-4 mb-4">
-          <div class="tech-security-no bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">02</div>
+          <div class="flex-shrink-0">
+            <img src="02C.webp" alt="02" class="block w-16 h-16 object-contain" />
+          </div>
           <h3 class="text-lg font-bold text-nature-800">次世代圖片壓縮技術</h3>
         </div>
         <p class="text-gray-600 text-sm leading-relaxed">全站圖片自動轉換為 Google 推薦的 WebP 等次世代格式，在維持高畫質的同時將檔案體積壓縮到更小幅度，提升整體速度。</p>
@@ -4670,7 +4710,9 @@
 
       <div id="card-tech-seo" class="tech-security-card bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
         <div class="flex items-center gap-4 mb-4">
-          <div class="tech-security-no bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">03</div>
+          <div class="flex-shrink-0">
+            <img src="03C.webp" alt="03" class="block w-16 h-16 object-contain" />
+          </div>
           <h3 class="text-lg font-bold text-nature-800">技術型 SEO 標籤佈署</h3>
         </div>
         <p class="text-gray-600 text-sm leading-relaxed">每一頁皆可獨立設定 SEO 標題（Meta Title）與描述（Meta Description），並自動生成 Sitemap，提升搜尋引擎收錄效率。</p>
@@ -4678,7 +4720,9 @@
 
       <div id="card-tech-social" class="tech-security-card bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
         <div class="flex items-center gap-4 mb-4">
-          <div class="tech-security-no bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">04</div>
+          <div class="flex-shrink-0">
+            <img src="04C.webp" alt="04" class="block w-16 h-16 object-contain" />
+          </div>
           <h3 class="text-lg font-bold text-nature-800">社群分享優化 (Open Graph)</h3>
         </div>
         <p class="text-gray-600 text-sm leading-relaxed">完整設定網站在 Line 與 Facebook 的分享規格，連結貼出時可自動抓取品牌縮圖與標題，維持一致且專業的曝光品質。</p>
@@ -4686,7 +4730,9 @@
 
       <div id="card-sec-serverless" class="tech-security-card bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
         <div class="flex items-center gap-4 mb-4">
-          <div class="tech-security-no bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">05</div>
+          <div class="flex-shrink-0">
+            <img src="05C.webp" alt="05" class="block w-16 h-16 object-contain" />
+          </div>
           <h3 class="text-lg font-bold text-nature-800">無伺服器軍規防駭架構</h3>
         </div>
         <p class="text-gray-600 text-sm leading-relaxed">採用現代化無伺服器架構，徹底降低傳統後端攻擊面，對常見注入與資料庫層風險具更高抵禦力，提供更高等級資安保護。</p>
@@ -4694,7 +4740,9 @@
 
       <div id="card-sec-cms" class="tech-security-card bg-white rounded-2xl p-6 shadow-sm border border-gray-100 transition-all">
         <div class="flex items-center gap-4 mb-4">
-          <div class="tech-security-no bg-nature-50 text-nature-500 rounded-xl w-14 h-14 flex items-center justify-center font-bold text-xl border border-gray-100 shadow-sm flex-shrink-0">06</div>
+          <div class="flex-shrink-0">
+            <img src="06C.webp" alt="06" class="block w-16 h-16 object-contain" />
+          </div>
           <h3 class="text-lg font-bold text-nature-800">輕量級智能內容後台 (Headless CMS)</h3>
         </div>
         <p class="text-gray-600 text-sm leading-relaxed">可針對最新消息與作品案例導入 Headless CMS，以直覺化流程更新內容，同步兼顧前端穩定性與維護效率。</p>
