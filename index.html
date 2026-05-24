@@ -1329,6 +1329,50 @@
       font-weight: 700;
       opacity: .72;
     }
+
+    /* Section 2 to footer unified background */
+    #tech-bottom-unified-bg {
+      background:
+        linear-gradient(#ffffff, #ffffff) top / 100% 80px no-repeat,
+        linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.88) 18%, rgba(247, 241, 232, 0.74) 42%, rgba(236, 228, 214, 0.68) 68%, rgba(226, 216, 199, 0.62) 100%),
+        url('back模擬.png') center -186px / cover no-repeat !important;
+    }
+    #tech-bottom-unified-bg #tech-grid,
+    #tech-bottom-unified-bg #contact-map-grid,
+    #tech-bottom-unified-bg #cta-section,
+    #tech-bottom-unified-bg footer {
+      background: transparent !important;
+    }
+    @media (max-width: 1023px) {
+      body:not(.mobile-preview-mode) {
+        padding-bottom: 0 !important;
+      }
+      body:not(.mobile-preview-mode) #preview-browser-wrapper {
+        margin-bottom: 0 !important;
+      }
+      body:not(.mobile-preview-mode) #preview-browser,
+      body:not(.mobile-preview-mode) #preview-browser > .relative {
+        background: #ffffff !important;
+        background-image: none !important;
+      }
+      #tech-bottom-unified-bg {
+        background:
+          linear-gradient(#ffffff, #ffffff) top / 100% 80px no-repeat,
+          linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.78) 18%, rgba(247, 241, 232, 0.54) 42%, rgba(236, 228, 214, 0.48) 68%, rgba(226, 216, 199, 0.42) 100%),
+          url('back模擬.png') center top / cover no-repeat !important;
+      }
+      body:not(.mobile-preview-mode) #tech-bottom-unified-bg {
+        background:
+          linear-gradient(#ffffff, #ffffff) top / 100% 80px no-repeat,
+          #ffffff !important;
+      }
+    }
+    body.mobile-preview-mode #tech-bottom-unified-bg {
+      background:
+        linear-gradient(#ffffff, #ffffff) top / 100% 80px no-repeat,
+        linear-gradient(180deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.78) 18%, rgba(247, 241, 232, 0.54) 42%, rgba(236, 228, 214, 0.48) 68%, rgba(226, 216, 199, 0.42) 100%),
+        url('back模擬.png') center top / cover no-repeat !important;
+    }
     .cta-panel h3 {
       letter-spacing: .08em;
       line-height: 1.18;
@@ -2003,6 +2047,12 @@
       body:not(.mobile-preview-mode) #page-main {
         padding-top: 18px;
       }
+      body:not(.mobile-preview-mode) {
+        padding-bottom: 0 !important;
+      }
+      body:not(.mobile-preview-mode) #preview-browser-wrapper {
+        margin-bottom: 0 !important;
+      }
       body:not(.mobile-preview-mode) #mobile-tap-hint {
         left: 12px;
         right: 90px;
@@ -2647,7 +2697,7 @@
       </div>
 
       <!-- 模擬網頁內容區 -->
-      <div class="relative bg-white pb-24 overflow-visible">
+      <div class="relative bg-white overflow-visible">
 
         <!-- ▌標示：RWD 跨裝置（floating badge） -->
         <div id="ann-uiux-rwd" class="annotation-wrapper absolute top-4 left-4 z-40">
@@ -2853,7 +2903,7 @@
           <div id="hero-link-group" class="hero-link-dots feature-dash-border is-dimmed" aria-label="Hero 互動點">
             <span class="hero-link-dot is-active" aria-current="page" aria-label="暮霧" data-label="暮霧"></span>
             <a href="模擬網頁Ｂ.html" class="hero-link-dot" aria-label="月霽" data-label="月霽"></a>
-            <a href="模擬網頁C.html" class="hero-link-dot" aria-label="青岑" data-label="青岑"></a>
+            <span class="hero-link-dot" aria-hidden="true" data-label="青岑"></span>
           </div>
 
           <!-- ── Mock Hero Banner ── -->
@@ -2905,6 +2955,8 @@
             </svg>
           </div>
         </div>
+
+    <div id="tech-bottom-unified-bg">
 
     <!-- ─────────────────────────────────────────
          區塊二：底層技術與資安
@@ -3188,6 +3240,8 @@
             </div>
           </div>
         </footer>
+
+      </div><!-- / tech-bottom-unified-bg -->
 
       </div><!-- / mockup-content -->
     </div><!-- / browser -->
